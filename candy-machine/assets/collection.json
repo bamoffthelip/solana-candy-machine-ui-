@@ -1,0 +1,16 @@
+{
+  "name": "Epstain NFT",
+  "symbol": "EPNFT",
+  "description": "Epstain Meme Coin NFT Collection for Epstain enthusiasts. Own a piece of the meme culture with our exclusive NFTs.",
+  "image": "collection.png",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "collection.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

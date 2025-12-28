@@ -1,0 +1,22 @@
+{
+  "tokenStandard": "nft",
+  "number": 2,
+  "symbol": "EPNFT",
+  "sellerFeeBasisPoints": 500,
+  "isMutable": true,
+  "isSequential": false,
+  "creators": [
+    {
+      "address": "DTwGZZSoXLYzgexDY8Cb9MKJ2tMsa1GcSqSpUgNgmjFH",
+      "share": 100
+    }
+  ],
+  "uploadMethod": "bundlr",
+  "ruleSet": null,
+  "awsConfig": null,
+  "sdriveApiKey": null,
+  "pinataConfig": null,
+  "hiddenSettings": null,
+  "guards": null,
+  "maxEditionSupply": null
+}
