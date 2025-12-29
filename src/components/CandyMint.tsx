@@ -3,7 +3,7 @@ import { FC, useCallback, useMemo } from 'react';
 import { notify } from "../utils/notifications";
 import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { generateSigner, transactionBuilder, publicKey, some } from '@metaplex-foundation/umi';
+import { generateSigner, transactionBuilder, publicKey } from '@metaplex-foundation/umi';
 import { fetchCandyMachine, mintV2, mplCandyMachine, safeFetchCandyGuard } from "@metaplex-foundation/mpl-candy-machine";
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import { mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
@@ -77,6 +77,9 @@ export const CandyMint: FC = () => {
                         nftMint,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
+                        mintArgs: {
+                            solPayment: { destination: treasury },
+                        },
                     })
                 );
             console.log('Transaction built, sending...');
