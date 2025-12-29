@@ -17,13 +17,6 @@
   "sdriveApiKey": null,
   "pinataConfig": null,
   "hiddenSettings": null,
-  "guards": {
-    "default": {
-      "solPayment": {
-        "value": 0.001,
-        "destination": "DTwGZZSoXLYzgexDY8Cb9MKJ2tMsa1GcSqSpUgNgmjFH"
-      }
-    }
-  },
+  "guards": null,
   "maxEditionSupply": null
 }

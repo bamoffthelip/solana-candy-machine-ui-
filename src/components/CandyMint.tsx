@@ -3,8 +3,8 @@ import { FC, useCallback, useMemo } from 'react';
 import { notify } from "../utils/notifications";
 import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { generateSigner, transactionBuilder, publicKey, none } from '@metaplex-foundation/umi';
-import { fetchCandyMachine, mint, mplCandyMachine } from "@metaplex-foundation/mpl-candy-machine";
+import { generateSigner, transactionBuilder, publicKey, keypairIdentity } from '@metaplex-foundation/umi';
+import { fetchCandyMachine, mplCandyMachine, mintV2 } from "@metaplex-foundation/mpl-candy-machine";
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import { mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
@@ -63,12 +63,13 @@ export const CandyMint: FC = () => {
             const transaction = await transactionBuilder()
                 .add(setComputeUnitLimit(umi, { units: 800_000 }))
                 .add(
-                    mint(umi, {
+                    mintV2(umi, {
                         candyMachine: candyMachine.publicKey,
                         nftMint: nftMint.publicKey,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
                         nftMintAuthority: umi.identity,
+                        tokenStandard: 0,
                     })
                 );
             console.log('Transaction built, sending...');
