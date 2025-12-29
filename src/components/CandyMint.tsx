@@ -4,7 +4,7 @@ import { notify } from "../utils/notifications";
 import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { generateSigner, transactionBuilder, publicKey } from '@metaplex-foundation/umi';
-import { fetchCandyMachine, mint, mplCandyMachine } from "@metaplex-foundation/mpl-candy-machine";
+import { fetchCandyMachine, mintV1, mplCandyMachine } from "@metaplex-foundation/mpl-candy-machine";
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import { mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
 import { setComputeUnitLimit } from '@metaplex-foundation/mpl-toolbox';
@@ -63,12 +63,12 @@ export const CandyMint: FC = () => {
             const transaction = await transactionBuilder()
                 .add(setComputeUnitLimit(umi, { units: 800_000 }))
                 .add(
-                    mint(umi, {
+                    mintV1(umi, {
                         candyMachine: candyMachine.publicKey,
                         nftMint: nftMint.publicKey,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
-                        nftMintAuthority: umi.identity,
+                        mintAuthority: umi.identity,
                     })
                 );
             console.log('Transaction built, sending...');
