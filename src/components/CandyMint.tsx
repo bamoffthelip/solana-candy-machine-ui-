@@ -65,7 +65,7 @@ export const CandyMint: FC = () => {
                 .add(
                     mint(umi, {
                         candyMachine: candyMachine.publicKey,
-                        nftMint,
+                        nftMint: nftMint.publicKey,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
                         mintAuthority: umi.identity,
