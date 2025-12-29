@@ -77,6 +77,9 @@ export const CandyMint: FC = () => {
                         nftMint,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
+                        mintArgs: {
+                            solPayment: some({ destination: treasury }),
+                        },
                     })
                 );
             console.log('Transaction built, sending...');
