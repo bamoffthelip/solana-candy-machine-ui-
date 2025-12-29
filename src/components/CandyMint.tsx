@@ -55,14 +55,6 @@ export const CandyMint: FC = () => {
             );
             console.log('Candy machine fetched:', candyMachine);
             
-            // Fetch the Candy Guard.
-            console.log('Fetching candy guard...');
-            const candyGuard = await safeFetchCandyGuard(
-                umi,
-                candyMachine.mintAuthority,
-            );
-            console.log('Candy guard fetched:', candyGuard);
-            
             // Mint from the Candy Machine.
             const nftMint = generateSigner(umi);
             console.log('Generated NFT mint signer:', nftMint.publicKey);
@@ -73,13 +65,9 @@ export const CandyMint: FC = () => {
                 .add(
                     mintV2(umi, {
                         candyMachine: candyMachine.publicKey,
-                        candyGuard: candyGuard?.publicKey,
                         nftMint,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
-                        mintArgs: {
-                            solPayment: { destination: treasury },
-                        },
                     })
                 );
             console.log('Transaction built, sending...');
