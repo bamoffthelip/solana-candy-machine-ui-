@@ -68,7 +68,7 @@ export const CandyMint: FC = () => {
                         nftMint: nftMint.publicKey,
                         collectionMint: candyMachine.collectionMint,
                         collectionUpdateAuthority: candyMachine.authority,
-                        mintAuthority: umi.identity,
+                        nftMintAuthority: umi.identity,
                     })
                 );
             console.log('Transaction built, sending...');
