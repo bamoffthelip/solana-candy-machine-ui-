@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { keypairIdentity, publicKey, some, none } from '@metaplex-foundation/umi';
+import { keypairIdentity, publicKey, some, none, Signer } from '@metaplex-foundation/umi';
 import { mplTokenMetadata, findMetadataPda, findMasterEditionPda } from '@metaplex-foundation/mpl-token-metadata';
-import { mintToCollectionV1, mplBubblegum, TokenStandard } from '@metaplex-foundation/mpl-bubblegum';
+import { mintToCollectionV1, mplBubblegum, TokenStandard, MetadataArgsArgs } from '@metaplex-foundation/mpl-bubblegum';
 import bs58 from 'bs58';
 
 // Configuration
