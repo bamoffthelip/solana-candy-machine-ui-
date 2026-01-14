@@ -60,6 +60,11 @@ export const AppBar: React.FC = () => {
             navigationStarts={() => setIsNavOpen(false)}
           />
           <NavElement
+            label="Mint cNFT"
+            href="/cnft"
+            navigationStarts={() => setIsNavOpen(false)}
+          />
+          <NavElement
             label="Basics"
             href="/basics"
             navigationStarts={() => setIsNavOpen(false)}

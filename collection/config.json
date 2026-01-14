@@ -1,8 +1,8 @@
 {
   "tokenStandard": "nft",
-  "number": 2,
-  "symbol": "UNIFY",
-  "sellerFeeBasisPoints": 500,
+  "number": 15,
+  "symbol": "UNFT",
+  "sellerFeeBasisPoints": 100,
   "isMutable": true,
   "isSequential": false,
   "creators": [

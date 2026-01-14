@@ -10,24 +10,24 @@
       "name": "Epstain NFT",
       "image_hash": "95992500210c45002def9d44c8dcfd475fd4eceb64a6d32af35b22e647963f1a",
       "image_link": "https://gateway.irys.xyz/tuezNPYaU7L8E2SJ2Xpv3Lxj8gbgjWx0oIiAj36t06o?ext=png",
-      "metadata_hash": "fd70d341957f0e80d7471e2e6027cd65cd2a6f01fb734e35f32ec30129331eec",
-      "metadata_link": "https://gateway.irys.xyz/t4LlVl9pioVosJ5SaWPvU7wEH1sKXR5wZKESB1NDuQU",
-      "onChain": true
+      "metadata_hash": "75165d95cc0bd222434140309fbfbe27743ac8b401e56a25ef46c2b273d57f8c",
+      "metadata_link": "https://gateway.irys.xyz/gMGTlggPlibLlbN2aTGRmx1t84Q0_v6A1SJyK4OxISk",
+      "onChain": false
     },
     "0": {
       "name": "EPSTAIN NFT BROS ONLY EDITION",
       "image_hash": "dad311016c0361ec8595a5255ea2ba3fdf761fea6af60434a5a7359df2179460",
       "image_link": "https://gateway.irys.xyz/cRQU6tv_8EQq3TfFf2RchKOott-jvo4kqdYNWQLVMJM?ext=png",
-      "metadata_hash": "21550026c46ba593d1ce70b89d03cb06e0369973bcee6462aaaec3a8a48da005",
-      "metadata_link": "https://gateway.irys.xyz/BzHidumRqA5B9gXV2x_nEmRffPucZY0vSggiYzuAYmE",
+      "metadata_hash": "929b77de7528e8db67a1b12e31d1076c5f37a5059bbcff7a3ade5b7e481ddfb7",
+      "metadata_link": "https://gateway.irys.xyz/zgSEr-P_Q2gNkNjT7xU_rdl9AvCyG_daC9JACvN1mGM",
       "onChain": true
     },
     "1": {
       "name": "My NFT #1",
       "image_hash": "dad311016c0361ec8595a5255ea2ba3fdf761fea6af60434a5a7359df2179460",
       "image_link": "https://gateway.irys.xyz/mrdjaq4CSwsUlzYQQjY1OPchEicP1CXCzlznxI9rXCk?ext=png",
-      "metadata_hash": "9fb9564c7f87dcf2183d190840bb0c8a351bcc006c800ff810b6d505722fa33a",
-      "metadata_link": "https://gateway.irys.xyz/BTp81azgMq4v_fZ2QxNlcnuTpM6xfk6fyAZs1iDxkR8",
+      "metadata_hash": "fba11121c83d116b866d35f69b41e8f14d254aac901b5968790c1fa100c387da",
+      "metadata_link": "https://gateway.irys.xyz/O-UPuotdWJpU07kNhHreGIEPfEuzmsYBqqhlJfpclgI",
       "onChain": true
     }
   }
