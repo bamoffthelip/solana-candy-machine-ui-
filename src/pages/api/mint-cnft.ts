@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { keypairIdentity, publicKey, some, none } from '@metaplex-foundation/umi';
+import { keypairIdentity, publicKey, some, none, Signer } from '@metaplex-foundation/umi';
 import { mplTokenMetadata, findMetadataPda, findMasterEditionPda } from '@metaplex-foundation/mpl-token-metadata';
-import { mintToCollectionV1, mplBubblegum, TokenStandard } from '@metaplex-foundation/mpl-bubblegum';
+import { mintToCollectionV1, mplBubblegum, TokenStandard, MetadataArgsArgs } from '@metaplex-foundation/mpl-bubblegum';
 import * as bs58 from 'bs58';
 
 // Configuration
@@ -73,8 +73,8 @@ export default async function handler(
     const mintIndex = metadataIndex ?? globalMintIndex++;
     const metadataUri = `${METADATA_BASE_URI}/${mintIndex}.json`;
 
-    // Build metadata
-    const metadata = {
+    // Build metadata with proper types
+    const metadata: MetadataArgsArgs = {
       name: `Unify NFT #${mintIndex}`,
       symbol: 'UNIFY',
       uri: metadataUri,
@@ -92,7 +92,7 @@ export default async function handler(
       ],
       primarySaleHappened: false,
       isMutable: true,
-      editionNonce: none(),
+      editionNonce: none<number>(),
       tokenStandard: some(TokenStandard.NonFungible),
       uses: none(),
       tokenProgramVersion: 0,
@@ -105,7 +105,7 @@ export default async function handler(
       collectionMint: collectionMint,
       collectionMetadata: collectionMetadata,
       collectionEdition: collectionEdition,
-      collectionAuthority: authorityKeypair,
+      collectionAuthority: umi.identity as Signer,
       metadata: metadata,
     });
 
