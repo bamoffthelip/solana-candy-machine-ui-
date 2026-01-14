@@ -1,0 +1,25 @@
+{
+  "name": "Unify NFT #4",
+  "symbol": "UNIFY",
+  "description": "Unify NFT Collection - Exclusive member edition",
+  "image": "4.png",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "4.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

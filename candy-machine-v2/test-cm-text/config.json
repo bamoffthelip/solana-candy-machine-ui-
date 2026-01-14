@@ -1,0 +1,21 @@
+{
+  "number": 1,
+  "symbol": "UNIFY",
+  "sellerFeeBasisPoints": 500,
+  "isMutable": true,
+  "isSequential": false,
+  "creators": [
+    {
+      "address": "66LDYvh9wso6Q8xtvSorh7BcP3sBgJrq9g5QXMNJfjtt",
+      "share": 100
+    }
+  ],
+  "uploadMethod": "bundlr",
+  "awsConfig": null,
+  "nftStorageAuthToken": null,
+  "shdwStorageAccount": null,
+  "pinataConfig": null,
+  "hiddenSettings": null,
+  "guards": null,
+  "ruleSet": null
+}

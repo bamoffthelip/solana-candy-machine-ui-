@@ -1,0 +1,22 @@
+{
+  "tokenStandard": "nft",
+  "number": 1,
+  "symbol": "UNIFY",
+  "sellerFeeBasisPoints": 500,
+  "isMutable": true,
+  "isSequential": false,
+  "creators": [
+    {
+      "address": "66LDYvh9wso6Q8xtvSorh7BcP3sBgJrq9g5QXMNJfjtt",
+      "share": 100
+    }
+  ],
+  "uploadMethod": "bundlr",
+  "ruleSet": null,
+  "awsConfig": null,
+  "sdriveApiKey": null,
+  "pinataConfig": null,
+  "hiddenSettings": null,
+  "guards": null,
+  "maxEditionSupply": null
+}

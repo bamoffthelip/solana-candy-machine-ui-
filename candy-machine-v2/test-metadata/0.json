@@ -1,0 +1,25 @@
+{
+  "name": "Test Unify NFT #1",
+  "symbol": "UNIFY",
+  "description": "Unify NFT Collection - Test Edition",
+  "image": "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeige6rnmls52dvpmwjdvd6eblzqgdpvjwtrozup4gb7brqra2umwku",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Test"
+    },
+    {
+      "trait_type": "Number",
+      "value": "1"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeige6rnmls52dvpmwjdvd6eblzqgdpvjwtrozup4gb7brqra2umwku",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

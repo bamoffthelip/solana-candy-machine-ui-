@@ -1,0 +1,16 @@
+{
+  "name": "Unify Collection",
+  "symbol": "UNIFY",
+  "description": "Unify NFT Collection",
+  "image": "collection.png",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "collection.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

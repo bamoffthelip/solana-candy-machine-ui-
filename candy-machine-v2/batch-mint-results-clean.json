@@ -1,0 +1,14 @@
+[
+  {
+    "recipient": "DTwGZZSoXLYzgexDY8Cb9MKJ2tMsa1GcSqSpUgNgmjFH",
+    "status": "success",
+    "index": 0,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeiascws7hnrbos6f7nimovkhpmyyocpw26aof4tld2sjf6mj3qlwti/0.json"
+  },
+  {
+    "recipient": "DFsR4Ex82qD77K2JRAr8xp6SK4th6ghuB8aU4nAgh4kZ",
+    "status": "success",
+    "index": 1,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeiascws7hnrbos6f7nimovkhpmyyocpw26aof4tld2sjf6mj3qlwti/1.json"
+  }
+]

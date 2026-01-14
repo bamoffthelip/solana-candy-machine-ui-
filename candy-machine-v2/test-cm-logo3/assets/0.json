@@ -1,0 +1,17 @@
+{
+  "name": "Logo Test NFT #0",
+  "symbol": "UNIFY",
+  "description": "Phantom test - Sigma Chi logo graphic (no 'Epstain' text)",
+  "image": "0.png",
+  "attributes": [
+    { "trait_type": "Test", "value": "Logo" },
+    { "trait_type": "Variant", "value": "Sigma Chi" },
+    { "trait_type": "Number", "value": "0" }
+  ],
+  "properties": {
+    "files": [
+      { "uri": "0.png", "type": "image/png" }
+    ],
+    "category": "image"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Text Test Collection",
+  "symbol": "UNIFY",
+  "description": "Phantom test collection - text overlay",
+  "image": "collection.png",
+  "attributes": [],
+  "properties": {
+    "files": [ { "uri": "collection.png", "type": "image/png" } ],
+    "category": "image"
+  }
+}

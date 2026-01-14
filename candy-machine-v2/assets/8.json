@@ -1,0 +1,25 @@
+{
+  "name": "Unify NFT #8",
+  "symbol": "UNIFY",
+  "description": "Unify NFT Collection - Exclusive member edition",
+  "image": "8.png",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "8.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

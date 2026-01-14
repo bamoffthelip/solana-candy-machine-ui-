@@ -1,0 +1,93 @@
+[
+  {
+    "recipient": "DTwGZZSoXLYzgexDY8Cb9MKJ2tMsa1GcSqSpUgNgmjFH",
+    "status": "success",
+    "index": 0,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/0.json",
+    "verified": true
+  },
+  {
+    "recipient": "DFsR4Ex82qD77K2JRAr8xp6SK4th6ghuB8aU4nAgh4kZ",
+    "status": "success",
+    "index": 1,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/1.json",
+    "verified": true
+  },
+  {
+    "recipient": "A2CWFF2jNig2SEJQCDmVVAQKnWj6DdsRPAgdYDjx29FA",
+    "status": "success",
+    "index": 2,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/2.json",
+    "verified": true
+  },
+  {
+    "recipient": "2yisnFF7oppGpoKzEUdea9mbL8brbjjNdt2dYmuEjULP",
+    "status": "success",
+    "index": 3,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/3.json",
+    "verified": true
+  },
+  {
+    "recipient": "73ATS1gRpUyjeKC9gNTevVgHFmivp9C4ERVApdzDqsZB",
+    "status": "success",
+    "index": 4,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/4.json",
+    "verified": true
+  },
+  {
+    "recipient": "2YntdszHWMTgP414mzb9ae6qDnicU4cbGjbDza8yz85V",
+    "status": "success",
+    "index": 5,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/5.json",
+    "verified": true
+  },
+  {
+    "recipient": "2o51K6oNKu6BC2nsX25dsVRPAmq6TgJjWaVohdrHpbkV",
+    "status": "success",
+    "index": 6,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/6.json",
+    "verified": true
+  },
+  {
+    "recipient": "GenNjD5cDpXwwCPPC9spPTBmTXaW9tLSrAaRQEh9b3aW",
+    "status": "success",
+    "index": 7,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/7.json",
+    "verified": true
+  },
+  {
+    "recipient": "Fz8XejQqhTdmuovGmdT92wtVj3LET5HeTS5Y1rNBrByo",
+    "status": "success",
+    "index": 8,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/8.json",
+    "verified": true
+  },
+  {
+    "recipient": "3dmGpFAPtbLMxsw4gKEGgErakXHwUdbFZqExknprez49",
+    "status": "success",
+    "index": 9,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/9.json",
+    "verified": true
+  },
+  {
+    "recipient": "7C3Ry3AZjJyGHnDaFeCy37VacBCBjjxGGTNyJRyDBNr1",
+    "status": "success",
+    "index": 10,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/10.json",
+    "verified": true
+  },
+  {
+    "recipient": "8sFkvrxuURdF9C5STMRrxYrstGaYnLBK5T3uxenKwykU",
+    "status": "success",
+    "index": 11,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/11.json",
+    "verified": true
+  },
+  {
+    "recipient": "BesAgSUmJFWHnD4PBQTYhMCdBS4J6SgzxDdtWuywzrXS",
+    "status": "success",
+    "index": 12,
+    "metadataUri": "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce/12.json",
+    "verified": true
+  }
+]

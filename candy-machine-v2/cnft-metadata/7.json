@@ -1,0 +1,25 @@
+{
+  "name": "Unify NFT #7",
+  "symbol": "UNIFY",
+  "description": "Unify NFT Collection",
+  "image": "https://gateway.pinata.cloud/ipfs/bafybeia575s6nzx4pfecxeh3xzdj52uh4rcdz6mtuer5nktgldpjzcqc5q",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "cNFT"
+    },
+    {
+      "trait_type": "Number",
+      "value": "7"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://gateway.pinata.cloud/ipfs/bafybeia575s6nzx4pfecxeh3xzdj52uh4rcdz6mtuer5nktgldpjzcqc5q",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}

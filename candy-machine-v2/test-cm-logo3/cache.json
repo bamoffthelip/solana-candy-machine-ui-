@@ -1,0 +1,26 @@
+{
+  "program": {
+    "candyMachine": "H3NPGMfeTiYH9ExSN4fPT7w8CJvji6uzhHozMzErZxVn",
+    "candyGuard": "",
+    "candyMachineCreator": "5jN47RVc9gh51LfCTV34WT86oXYZwagQBpdzqgKRPNXQ",
+    "collectionMint": "C3FBok1vhu9zM5xMZvjKSVCHa3CUnSdRkM8CeXU2X885"
+  },
+  "items": {
+    "-1": {
+      "name": "Logo Test Collection",
+      "image_hash": "379eec839286985592645efd1a48dcc92bcec9ee2ecf4d88dd0ec76fbdde89af",
+      "image_link": "https://gateway.irys.xyz/iT2HLo5l6lyiokPCAfKsy2kJL9E7Q49Ju9WMe4fxJSg?ext=png",
+      "metadata_hash": "a058fc5a54980a087d16c8df16f4d1bbd2d9595334d25e92a610afac3903ede9",
+      "metadata_link": "https://gateway.irys.xyz/fg1c5bEG5O-6IX7k17AkUn6EPSkhHyXE_dqFV_9FBLM",
+      "onChain": true
+    },
+    "0": {
+      "name": "Logo Test NFT #0",
+      "image_hash": "379eec839286985592645efd1a48dcc92bcec9ee2ecf4d88dd0ec76fbdde89af",
+      "image_link": "https://gateway.irys.xyz/8LpyaCvsczx-3GZ_7filrjeMEVktGg_YTZUDtY4HTWQ?ext=png",
+      "metadata_hash": "94927bf290da62e3777fe3416bc79928e1f474bed87c9496cc609fbcdfdc299b",
+      "metadata_link": "https://gateway.irys.xyz/UFjNrs_dUsTNngxCWmhcpx1o-rjZyoiWZojB83nYYgY",
+      "onChain": true
+    }
+  }
+}
