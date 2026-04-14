@@ -61,7 +61,12 @@ export const AppBar: React.FC = () => {
           />
           <NavElement
             label="Mint cNFT"
-            href="/cnft"
+            href="/mint/unify"
+            navigationStarts={() => setIsNavOpen(false)}
+          />
+          <NavElement
+            label="Airdrop"
+            href="/airdrop/unify"
             navigationStarts={() => setIsNavOpen(false)}
           />
           <NavElement
