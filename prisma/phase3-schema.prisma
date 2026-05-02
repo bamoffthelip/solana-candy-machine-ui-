@@ -1,0 +1,66 @@
+// Phase 3 additive schema draft for backend service layer.
+// Keep this file as a design/staging schema until merged into schema.prisma by migration.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MintJob {
+  id             String   @id @default(cuid())
+  projectId      String
+  campaignId     String?
+  recipient      String
+  idempotencyKey String   @unique
+  status         String
+  metadataIndex  Int?
+  txSignature    String?
+  errorMessage   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([projectId, status])
+  @@index([recipient])
+}
+
+model TokenGatePolicy {
+  id                 String   @id @default(cuid())
+  campaignId         String   @unique
+  enabled            Boolean  @default(false)
+  minTokenBalance    Float?
+  requiredCollection String?
+  allowlistJson      Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model MpcSession {
+  id             String   @id @default(cuid())
+  walletAddress  String
+  state          String
+  deviceId       String?
+  challengeNonce String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([walletAddress, state])
+}
+
+model WebhookEvent {
+  id           String   @id @default(cuid())
+  source       String
+  eventType    String
+  payload      Json
+  signature    String?
+  processed    Boolean  @default(false)
+  processedAt  DateTime?
+  errorMessage String?
+  receivedAt   DateTime @default(now())
+
+  @@index([source, eventType])
+  @@index([processed, receivedAt])
+}

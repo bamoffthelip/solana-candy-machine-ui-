@@ -5,10 +5,10 @@ import { useRouter } from "next/router";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useMemo, useState } from "react";
 import { getProjectConfigOrFallback } from "../../lib/project-config";
-import { MintButton } from "../../components/mint/MintButton";
-import { MintPreview } from "../../components/mint/MintPreview";
-import { MintProgress, MintStage } from "../../components/mint/MintProgress";
-import { MintSuccess } from "../../components/mint/MintSuccess";
+import { MintButton } from "../../ui/public-app/components/mint/MintButton";
+import { MintPreview } from "../../ui/public-app/components/mint/MintPreview";
+import { MintProgress, MintStage } from "../../ui/public-app/components/mint/MintProgress";
+import { MintSuccess } from "../../ui/public-app/components/mint/MintSuccess";
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,

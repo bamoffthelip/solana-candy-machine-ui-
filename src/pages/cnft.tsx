@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { CnftMintView } from "../views";
+import { CnftMintView } from "../ui/public-app/views";
 
 const CnftMintPage: NextPage = (props) => {
   return (

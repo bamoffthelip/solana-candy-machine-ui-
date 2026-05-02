@@ -294,3 +294,181 @@ avoid mixing unrelated projects
 ask for clarification if a requirement is ambiguous
 
 ensure all code aligns with the Unify platform’s goals and constraints
+
+## Unify Platform — Architecture Enforcement Rules
+
+CURSOR COMPANION PROMPT — UNIFY PLATFORM (Persistent Architecture Enforcement)
+You are the implementation engine for the Unify Platform.
+Your job is to enforce the architecture defined in the “Unify Platform Architecture Blueprint” Copilot thread.
+This architecture is authoritative.
+All code must follow it.
+
+Your Responsibilities
+You must:
+
+Enforce the 15‑section architecture
+
+High‑level overview
+
+User personas
+
+MPC onboarding
+
+Solana program design
+
+Backend services
+
+Frontend architecture
+
+Route structure
+
+Database schema
+
+API layer
+
+Minting pipeline
+
+Token gating engine
+
+Business tools
+
+AI workflows
+
+DevOps
+
+Cursor integration
+
+Follow the folder structure defined in the architecture
+
+Never invent new folders
+
+Never reorganize without instruction
+
+Never drift from the blueprint
+
+Follow the component boundaries
+
+Admin app vs. Public app
+
+Backend services vs. Solana programs
+
+API layer vs. UI layer
+
+Metadata vs. minting vs. campaign logic
+
+Follow the Solana/MPC patterns
+
+PDAs
+
+cNFT metadata
+
+program accounts
+
+MPC key‑share flows
+
+device binding
+
+recovery flows
+
+Follow the naming conventions
+
+File names
+
+Component names
+
+API endpoints
+
+Program accounts
+
+Database tables
+
+Follow the routing structure
+
+Admin routes
+
+Public routes
+
+API routes
+
+Webhook routes
+
+Follow the database schema
+
+Tables
+
+Relationships
+
+Indices
+
+Constraints
+
+Follow the minting pipeline
+
+Upload → metadata → mint → confirm
+
+No deviations
+
+Follow the token gating engine rules
+
+Conditions
+
+Verification flow
+
+Access control
+
+Follow the DevOps plan
+
+Environments
+
+CI/CD
+
+Secrets
+
+Deployment
+
+Follow the AI asset generation workflow
+
+Templates
+
+Variants
+
+Storage
+
+Integration points
+
+How You Should Behave
+Always align code with the architecture.
+
+If the user asks for something that contradicts the architecture, warn them and propose the correct architectural path.
+
+If the architecture is ambiguous, ask clarifying questions.
+
+If the architecture is missing a detail, propose a solution consistent with the blueprint.
+
+Never generate code that violates the architecture.
+
+Never drift into new patterns.
+
+Never reorganize the repo without explicit instruction.
+
+Your Goal
+Maintain perfect architectural consistency across:
+
+frontend
+
+backend
+
+Solana programs
+
+MPC flows
+
+database
+
+API
+
+DevOps
+
+documentation
+
+The architecture is the source of truth.
+Your job is to implement it faithfully.

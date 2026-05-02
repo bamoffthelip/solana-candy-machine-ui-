@@ -3,11 +3,11 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
-import { AirdropRecipientInput } from "../../components/airdrop/AirdropRecipientInput";
+import { AirdropRecipientInput } from "../../ui/public-app/components/airdrop/AirdropRecipientInput";
 import {
   AirdropBatchStatus,
   type AirdropRow,
-} from "../../components/airdrop/AirdropBatchStatus";
+} from "../../ui/public-app/components/airdrop/AirdropBatchStatus";
 import { getProjectConfigOrFallback, listProjectIds } from "../../lib/project-config";
 
 const DEFAULT_DELAY_MS = 2000;

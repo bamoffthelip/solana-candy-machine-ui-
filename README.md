@@ -21,6 +21,21 @@ npm install
 yarn install
 ```
 
+## Unify Architecture Scaffold
+
+The repository now includes a Unify-aligned architecture scaffold:
+
+- Admin/public route starters at `src/pages/admin` and `src/pages/public`
+- Backend service boundaries at `src/backend/services` and `src/backend/api`
+- Database schema starter at `prisma/schema.prisma`
+- Solana program skeleton at `programs/unify-core` and `Anchor.toml`
+
+Initialize or re-ensure required scaffold folders/files with:
+
+```bash
+npm run init:unify
+```
+
 ## Build and Run
 
 Next, run the development server:

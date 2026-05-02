@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { BasicsView } from "../views";
+import { BasicsView } from "../ui/public-app/views";
 
 const Basics: NextPage = (props) => {
   return (

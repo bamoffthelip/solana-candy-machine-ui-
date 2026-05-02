@@ -1,0 +1,16 @@
+[features]
+seeds = false
+skip-lint = false
+
+[programs.localnet]
+unify_core = "Fg6PaFpoGXkYsidMpWxTWqkZ7FEfcYkgSQ7VJ2i4wVQb"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "anchor test"
