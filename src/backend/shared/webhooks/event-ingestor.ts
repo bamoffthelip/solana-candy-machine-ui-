@@ -33,5 +33,11 @@ export function verifyWebhookSignature(
     .update(rawBody)
     .digest("hex");
 
-  return crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(computed));
+  const provided = Buffer.from(signatureHeader);
+  const expected = Buffer.from(computed);
+  if (provided.length !== expected.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(provided, expected);
 }
