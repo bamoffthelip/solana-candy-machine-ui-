@@ -67,6 +67,26 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
     symbol: "DEMO",
     defaultStartMetadataIndex: 0,
   },
+  unifygenesispromo: {
+    id: "unifygenesispromo",
+    title: "Unify Genesis Promo cNFT",
+    description:
+      "Free commemorative compressed NFT for the Unify x Epstain Genesis Promo. First-claim wins #1.",
+    mediaUrl:
+      process.env.NEXT_PUBLIC_UNIFY_GENESIS_MEDIA || DEFAULT_MEDIA,
+    attributes: [
+      { trait_type: "Campaign", value: "Unify Genesis Promo" },
+      { trait_type: "Edition", value: "Genesis" },
+      { trait_type: "Partner", value: "Epstain" },
+      { trait_type: "Type", value: "cNFT" },
+      { trait_type: "Network", value: "Solana" },
+    ],
+    metadataBaseUri:
+      process.env.NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI || DEFAULT_METADATA_BASE,
+    nftNameTemplate: "Unify Genesis Promo #{index}",
+    symbol: "UNIFY",
+    defaultStartMetadataIndex: 1,
+  },
 };
 
 export function listProjectIds(): string[] {
