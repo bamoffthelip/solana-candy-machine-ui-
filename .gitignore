@@ -49,3 +49,6 @@ yarn-error.log*
 candy-machine-v2/email-mint.js
 candy-machine-v2/email-mint-batch.js
 candy-machine-v2/test-crossmint-wallet.js
+
+# Persistent claim store (per-project counters and wallet claim history)
+/.data/
