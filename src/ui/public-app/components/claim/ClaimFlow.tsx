@@ -1,7 +1,10 @@
 import { ClaimSuccess } from "./ClaimSuccess";
+import { TurnstileWidget } from "./TurnstileWidget";
 import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
@@ -36,19 +39,25 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
     metadataIndex: number;
     imageUrl: string;
   }>(null);
-  
-  const canClaimWithWallet = Boolean(wallet.publicKey);
-  const canClaimWithMpc = mpcWalletAddress.trim().length > 0;
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const onTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
+
+  const turnstileRequired = Boolean(TURNSTILE_SITE_KEY);
+  const turnstileReady = !turnstileRequired || turnstileToken.length > 0;
+
+  const canClaimWithWallet = Boolean(wallet.publicKey) && turnstileReady;
+  const canClaimWithMpc = mpcWalletAddress.trim().length > 0 && turnstileReady;
 
   const submitClaim = async () => {
     setError("");
     setResult(null);
     setIsSubmitting(true);
     try {
-      const payload =
+      const base =
         method === "wallet"
           ? { projectId, walletAddress: wallet.publicKey?.toBase58() }
           : { projectId, mpcWalletAddress: mpcWalletAddress.trim() };
+      const payload = turnstileToken ? { ...base, turnstileToken } : base;
 
       const response = await fetch("/api/claim", {
         method: "POST",
@@ -147,13 +156,17 @@ setSuccess({
         {isSubmitting ? "Claiming..." : "Claim NFT"}
       </button>
 
+      <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={onTurnstileToken} />
+      {turnstileRequired && !turnstileReady ? (
+        <p className="text-xs opacity-70">Verifying you&apos;re human…</p>
+      ) : null}
+
       {error ? (
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {error}
         </div>
       ) : null}
-
-      
     </div>
   );
 }
+
