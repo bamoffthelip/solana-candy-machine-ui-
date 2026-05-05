@@ -1,9 +1,9 @@
-import { getAssetIdFromLeaf } from "@metaplex-foundation/mpl-bubblegum";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { keypairIdentity, publicKey, some, none, Signer } from "@metaplex-foundation/umi";
 import { mplTokenMetadata, findMetadataPda, findMasterEditionPda } from "@metaplex-foundation/mpl-token-metadata";
 import {
+  findLeafAssetIdPda,
   mintToCollectionV1,
   mplBubblegum,
   TokenStandard,
@@ -92,10 +92,9 @@ export default async function handler(
     umi.use(keypairIdentity(authorityKeypair));
 
     const collectionMint = publicKey(project.collectionMint || DEFAULT_COLLECTION_MINT);
-    const merkleTree = publicKey(project.merkleTree || DEFAULT_MERKLE_TREE);  // ⭐ moved above assetId
+    const merkleTree = publicKey(project.merkleTree || DEFAULT_MERKLE_TREE);
 
-    // ⭐ assetId must be computed AFTER merkleTree is defined
-    const assetId = getAssetIdFromLeaf(merkleTree, mintIndex);
+    const [assetId] = findLeafAssetIdPda(umi, { merkleTree, leafIndex: mintIndex });
 
     const collectionMetadata = findMetadataPda(umi, { mint: collectionMint });
     const collectionEdition = findMasterEditionPda(umi, { mint: collectionMint });

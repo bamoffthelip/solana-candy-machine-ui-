@@ -1,6 +1,6 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { FC, useCallback, useState } from "react";
-import { notify } from "../utils/notifications";
+import { notify } from "../../../utils/notifications";
 
 const COLLECTION_MINT =
   process.env.NEXT_PUBLIC_CNFT_COLLECTION || "DVaJS3FNBHvrWvZAEFNyNoi67ZqzJJ7gUoX6abHrQsM";

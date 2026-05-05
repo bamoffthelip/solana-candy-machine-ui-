@@ -8,10 +8,11 @@ import { ClaimFlow } from "../components/claim/ClaimFlow";
 
 const NftViewPage: NextPage = () => {
   const router = useRouter();
-  if (!router.isReady) return null;
   const projectId =
     typeof router.query.projectId === "string" ? router.query.projectId : "unify";
   const project = useMemo(() => getProjectConfigOrFallback(projectId), [projectId]);
+
+  if (!router.isReady) return null;
 
   return (
     <>

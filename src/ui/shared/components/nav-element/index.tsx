@@ -1,7 +1,7 @@
 /* tslint:disable:no-empty */
 import Link from 'next/link';
 import Text from '../Text';
-import { cn } from '../../utils';
+import { cn } from '../../../../utils';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
 

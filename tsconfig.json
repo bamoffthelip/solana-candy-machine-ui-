@@ -18,7 +18,18 @@
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", ".next",],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "src/backend/shared/db",
+    "src/backend/shared/mpc",
+    "src/backend/shared/webhooks",
+    "src/backend/shared/workers",
+    "src/backend/shared/token-gating",
+    "src/backend/public-app/api/webhooks",
+    "src/backend/public-app/api/workers",
+    "src/backend/admin-app"
+  ],
   "ts-node": {
     "require": ["tsconfig-paths/register"],
     "compilerOptions": {

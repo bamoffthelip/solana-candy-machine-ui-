@@ -1,4 +1,3 @@
-export * from "../public-app/api/mint-controller";
 import {
   buildMintPipelinePreview,
   MintPipelineInput,

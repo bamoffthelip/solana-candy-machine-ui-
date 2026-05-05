@@ -1,5 +1,5 @@
 import { FC, useCallback, useState, type ChangeEvent } from "react";
-import { parseSolanaAddresses } from "../../lib/parse-addresses";
+import { parseSolanaAddresses } from "../../../../lib/parse-addresses";
 
 type AirdropRecipientInputProps = {
   value: string;

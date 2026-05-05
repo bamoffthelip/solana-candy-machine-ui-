@@ -1,7 +1,7 @@
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { FC, useCallback, useMemo } from 'react';
-import { notify } from "../utils/notifications";
-import useUserSOLBalanceStore from '../stores/useUserSOLBalanceStore';
+import { notify } from "../../../utils/notifications";
+import useUserSOLBalanceStore from '../../../stores/useUserSOLBalanceStore';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { generateSigner, transactionBuilder, publicKey, keypairIdentity } from '@metaplex-foundation/umi';
 import { fetchCandyMachine, mplCandyMachine, mintV2 } from "@metaplex-foundation/mpl-candy-machine";
