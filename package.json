@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init:unify": "node ./scripts/init-unify.js"
+    "init:unify": "node ./scripts/init-unify.js",
+    "metadata:generate": "node ./scripts/generate-cnft-metadata-files.js"
   },
   "dependencies": {
     "@heroicons/react": "^1.0.5",

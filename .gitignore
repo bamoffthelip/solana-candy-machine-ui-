@@ -52,3 +52,6 @@ candy-machine-v2/test-crossmint-wallet.js
 
 # Persistent claim store (per-project counters and wallet claim history)
 /.data/
+
+# Generated cNFT metadata JSON (Pinata folder upload); do not commit
+/pinata-metadata-upload/
