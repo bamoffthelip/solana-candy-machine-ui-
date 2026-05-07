@@ -1,6 +1,9 @@
 /**
  * Per-project metadata index for cNFT mints (in-memory).
- * Replace with a database or counter service in production to avoid collisions across instances.
+ *
+ * Do not use this from serverless production APIs: each cold start resets the counter
+ * and you will mint duplicate indices. Use `reserveClaim` from `claim-store.ts` instead
+ * (Upstash / file-backed persistent counter).
  */
 
 const counters: Record<string, number> = {};

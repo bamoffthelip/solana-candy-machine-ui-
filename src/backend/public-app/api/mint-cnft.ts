@@ -5,7 +5,7 @@ import { mplTokenMetadata, findMetadataPda, findMasterEditionPda } from '@metapl
 import { mintToCollectionV1, mplBubblegum, TokenStandard, MetadataArgsArgs } from '@metaplex-foundation/mpl-bubblegum';
 import bs58 from 'bs58';
 import { formatNftName, getProjectConfigOrFallback } from '../../../lib/project-config';
-import { nextMetadataIndex } from '../../../lib/mint-index';
+import { releaseReservation, reserveClaim } from '../../../lib/claim-store';
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const DEFAULT_COLLECTION_MINT = process.env.CNFT_COLLECTION || 'DVaJS3FNBHvrWvZAEFNyNoi67ZqzJJ7gUoX6abHrQsM';
@@ -55,10 +55,13 @@ export default async function handler(
     const project = getProjectConfigOrFallback(projectId);
 
     let mintIndex: number;
+    let reservedSlot = false;
     if (typeof bodyMetadataIndex === 'number' && Number.isFinite(bodyMetadataIndex) && bodyMetadataIndex >= 0) {
       mintIndex = Math.floor(bodyMetadataIndex);
     } else {
-      mintIndex = nextMetadataIndex(projectId, project.defaultStartMetadataIndex);
+      const { metadataIndex } = await reserveClaim(projectId, recipient, project.defaultStartMetadataIndex);
+      mintIndex = metadataIndex;
+      reservedSlot = true;
     }
 
     const baseUri = project.metadataBaseUri.replace(/\/$/, '');
@@ -102,32 +105,43 @@ export default async function handler(
       tokenProgramVersion: 0,
     };
 
-    const tx = await mintToCollectionV1(umi, {
-      leafOwner: recipientPubkey,
-      merkleTree,
-      collectionMint,
-      collectionMetadata,
-      collectionEdition,
-      collectionAuthority: umi.identity as Signer,
-      metadata,
-    });
+    try {
+      const tx = await mintToCollectionV1(umi, {
+        leafOwner: recipientPubkey,
+        merkleTree,
+        collectionMint,
+        collectionMetadata,
+        collectionEdition,
+        collectionAuthority: umi.identity as Signer,
+        metadata,
+      });
 
-    const result = await tx.sendAndConfirm(umi);
-    const signature = bs58.encode(result.signature);
+      const result = await tx.sendAndConfirm(umi);
+      const signature = bs58.encode(result.signature);
 
-    console.log(`cNFT minted project=${projectId} index=${mintIndex} to ${recipient}, sig=${signature}`);
+      console.log(`cNFT minted project=${projectId} index=${mintIndex} to ${recipient}, sig=${signature}`);
 
-    return res.status(200).json({
-      success: true,
-      signature,
-      metadataIndex: mintIndex,
-      projectId,
-    });
+      return res.status(200).json({
+        success: true,
+        signature,
+        metadataIndex: mintIndex,
+        projectId,
+      });
+    } catch (mintError) {
+      if (reservedSlot) {
+        await releaseReservation(projectId, recipient).catch(() => undefined);
+      }
+      throw mintError;
+    }
   } catch (error: any) {
+    const msg = error?.message || 'Unknown error occurred';
+    if (typeof msg === 'string' && msg.includes('already claimed')) {
+      return res.status(400).json({ success: false, error: msg });
+    }
     console.error('Mint error:', error);
     return res.status(500).json({
       success: false,
-      error: error?.message || 'Unknown error occurred',
+      error: msg,
     });
   }
 }

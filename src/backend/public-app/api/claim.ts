@@ -11,7 +11,7 @@ import {
 } from "@metaplex-foundation/mpl-bubblegum";
 import bs58 from "bs58";
 import { formatNftName, getProjectConfigOrFallback } from "../../../lib/project-config";
-import { nextMetadataIndex } from "../../../lib/mint-index";
+import { releaseReservation, reserveClaim } from "../../../lib/claim-store";
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
 const DEFAULT_COLLECTION_MINT =
@@ -41,12 +41,7 @@ export default async function handler(
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  const {
-    projectId: rawProjectId,
-    metadataIndex: bodyMetadataIndex,
-    walletAddress,
-    mpcWalletAddress,
-  } = req.body || {};
+  const { projectId: rawProjectId, walletAddress, mpcWalletAddress } = req.body || {};
 
   const projectId = typeof rawProjectId === "string" && rawProjectId.length > 0 ? rawProjectId : "unify";
   const recipient = walletAddress || mpcWalletAddress;
@@ -75,12 +70,11 @@ export default async function handler(
     }
 
     const project = getProjectConfigOrFallback(projectId);
-    let mintIndex: number;
-    if (typeof bodyMetadataIndex === "number" && Number.isFinite(bodyMetadataIndex) && bodyMetadataIndex >= 0) {
-      mintIndex = Math.floor(bodyMetadataIndex);
-    } else {
-      mintIndex = nextMetadataIndex(projectId, project.defaultStartMetadataIndex);
-    }
+    const { metadataIndex: mintIndex } = await reserveClaim(
+      projectId,
+      recipient,
+      project.defaultStartMetadataIndex
+    );
 
     const baseUri = project.metadataBaseUri.replace(/\/$/, "");
     const metadataUri = `${baseUri}/${mintIndex}.json`;
@@ -123,32 +117,41 @@ export default async function handler(
       tokenProgramVersion: 0,
     };
 
-    const tx = await mintToCollectionV1(umi, {
-      leafOwner: recipientPubkey,
-      merkleTree,
-      collectionMint,
-      collectionMetadata,
-      collectionEdition,
-      collectionAuthority: umi.identity as Signer,
-      metadata,
-    });
+    try {
+      const tx = await mintToCollectionV1(umi, {
+        leafOwner: recipientPubkey,
+        merkleTree,
+        collectionMint,
+        collectionMetadata,
+        collectionEdition,
+        collectionAuthority: umi.identity as Signer,
+        metadata,
+      });
 
-    const result = await tx.sendAndConfirm(umi);
-    const signature = bs58.encode(result.signature);
+      const result = await tx.sendAndConfirm(umi);
+      const signature = bs58.encode(result.signature);
 
-    return res.status(200).json({
-      success: true,
-      claimMethod,
-      recipient,
-      signature,
-      metadataIndex: mintIndex,
-      projectId,
-      assetId: assetId.toString(),   // ⭐ added
-    });
+      return res.status(200).json({
+        success: true,
+        claimMethod,
+        recipient,
+        signature,
+        metadataIndex: mintIndex,
+        projectId,
+        assetId: assetId.toString(),
+      });
+    } catch (mintError) {
+      await releaseReservation(projectId, recipient).catch(() => undefined);
+      throw mintError;
+    }
   } catch (error: any) {
+    const msg = error?.message || "Unknown claim error occurred";
+    if (typeof msg === "string" && msg.includes("already claimed")) {
+      return res.status(400).json({ success: false, error: msg });
+    }
     return res.status(500).json({
       success: false,
-      error: error?.message || "Unknown claim error occurred",
+      error: msg,
     });
   }
 }

@@ -3,6 +3,7 @@ import { TurnstileWidget } from "./TurnstileWidget";
 import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useState } from "react";
+import { getProjectConfigOrFallback } from "../../../../lib/project-config";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
@@ -68,18 +69,29 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
       if (!response.ok || !body.success) {
         throw new Error(body.error || "Claim request failed");
       }
-      // Fetch metadata for the minted NFT
-const metadataResponse = await fetch(
-  `/api/public/nft/${body.metadataIndex}?projectId=${projectId}`
-);
-const metadata = await metadataResponse.json();
 
-// Set success state
-setSuccess({
-  mintAddress: body.assetId!,  // or body.mintAddress if your API returns it
-  metadataIndex: body.metadataIndex!,
-  imageUrl: metadata.image || metadata.properties?.image,
-});
+      const projectCfg = getProjectConfigOrFallback(projectId);
+      let imageUrl = projectCfg.mediaUrl;
+      try {
+        const metadataResponse = await fetch(
+          `/api/public/nft/${body.metadataIndex}?projectId=${encodeURIComponent(projectId)}`
+        );
+        if (metadataResponse.ok) {
+          const metadata = await metadataResponse.json();
+          if (metadata && typeof metadata === "object" && !("error" in metadata)) {
+            const m = metadata as { image?: string; properties?: { image?: string } };
+            imageUrl = m.image || m.properties?.image || imageUrl;
+          }
+        }
+      } catch {
+        /* keep projectCfg.mediaUrl */
+      }
+
+      setSuccess({
+        mintAddress: body.assetId!,
+        metadataIndex: body.metadataIndex!,
+        imageUrl,
+      });
 
     } catch (e: any) {
       setError(e?.message || "Unable to complete claim");
