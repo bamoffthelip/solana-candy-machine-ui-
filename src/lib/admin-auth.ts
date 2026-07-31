@@ -1,4 +1,15 @@
+import { timingSafeEqual } from "crypto";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+/** `timingSafeEqual` throws unless both buffers are the same length, so lengths are checked first. */
+function secretsMatch(provided: string, expected: string): boolean {
+  const providedBytes = Buffer.from(provided, "utf8");
+  const expectedBytes = Buffer.from(expected, "utf8");
+  if (providedBytes.length !== expectedBytes.length) {
+    return false;
+  }
+  return timingSafeEqual(providedBytes, expectedBytes);
+}
 
 /**
  * Shared admin auth helper.
@@ -29,7 +40,7 @@ export function requireAdmin(req: NextApiRequest, res: NextApiResponse): boolean
   const headerKey = req.headers["x-admin-key"];
   const provided = bearer || (typeof headerKey === "string" ? headerKey.trim() : "");
 
-  if (!provided || provided !== expected) {
+  if (!provided || !secretsMatch(provided, expected)) {
     res.status(401).json({ success: false, error: "Unauthorized" });
     return false;
   }
