@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useMemo, useState } from "react";
 import { getProjectConfigOrFallback } from "../../lib/project-config";
+import { CROSSMINT_WALLET_HELP_URL } from "../../lib/crossmint-links";
 import { MintButton } from "../../ui/public-app/components/mint/MintButton";
 import { MintPreview } from "../../ui/public-app/components/mint/MintPreview";
 import { MintProgress, MintStage } from "../../ui/public-app/components/mint/MintProgress";
@@ -113,7 +114,7 @@ const MintProjectPage: NextPage = () => {
               <div className="flex flex-wrap gap-2">
                 <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-sm" />
                 <a
-                  href="https://www.crossmint.com/"
+                  href={CROSSMINT_WALLET_HELP_URL}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-sm border border-white/20 bg-black/30"

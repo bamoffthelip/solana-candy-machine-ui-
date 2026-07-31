@@ -4,8 +4,42 @@ import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useState } from "react";
 import { getProjectConfigOrFallback } from "../../../../lib/project-config";
+import { CROSSMINT_WALLET_HELP_URL } from "../../../../lib/crossmint-links";
+import { useCrossmintEmbedded } from "../../../shared/contexts/crossmint-embedded-context";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+
+const CROSSMINT_CLIENT_KEY = (
+  process.env.NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY ||
+  process.env.NEXT_PUBLIC_CROSSMINT_API_KEY ||
+  ""
+).trim();
+
+function CrossmintMpcSectionLoadError() {
+  return (
+    <div className="rounded-lg border border-red-500/25 bg-red-500/10 p-3 text-[11px] leading-snug text-red-200/90">
+      Embedded Crossmint UI failed to load in the browser. Try disabling extensions/ad blockers, check the
+      Network tab for blocked scripts, and confirm Content-Security-Policy allows Crossmint. You can still
+      paste a recipient address below.
+    </div>
+  );
+}
+
+const CrossmintMpcSectionDynamic = dynamic(
+  () =>
+    import("./CrossmintMpcSection")
+      .then((m) => m.CrossmintMpcSection)
+      .catch(() => CrossmintMpcSectionLoadError),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-2 rounded-lg border border-white/10 bg-black/30 p-3">
+        <p className="text-xs font-medium text-white/90">Crossmint embedded wallet</p>
+        <p className="text-[11px] opacity-70">Loading sign-in…</p>
+      </div>
+    ),
+  }
+);
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
@@ -29,6 +63,7 @@ type ClaimResult = {
 };
 
 export function ClaimFlow({ projectId }: ClaimFlowProps) {
+  const { embeddedWalletReady, crossmintModuleError } = useCrossmintEmbedded();
   const wallet = useWallet();
   const [method, setMethod] = useState<ClaimMethod>("wallet");
   const [mpcWalletAddress, setMpcWalletAddress] = useState("");
@@ -42,6 +77,9 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
   }>(null);
   const [turnstileToken, setTurnstileToken] = useState<string>("");
   const onTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
+  const onCrossmintRecipientAddress = useCallback((addr: string) => {
+    setMpcWalletAddress(addr);
+  }, []);
 
   const turnstileRequired = Boolean(TURNSTILE_SITE_KEY);
   const turnstileReady = !turnstileRequired || turnstileToken.length > 0;
@@ -140,21 +178,42 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
       ) : (
         <div className="space-y-2">
           <p className="text-xs opacity-75">
-            Paste Crossmint MPC wallet address to mint directly to custody wallet.
+            Use an embedded Crossmint Solana wallet (below) or paste any valid Solana recipient address
+            (including a Crossmint MPC address from the Crossmint console).
           </p>
+          {!CROSSMINT_CLIENT_KEY ? (
+            <p className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-[11px] leading-snug text-amber-100/90">
+              Set <span className="font-mono">NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY</span> (or{" "}
+              <span className="font-mono">NEXT_PUBLIC_CROSSMINT_API_KEY</span>) on the server build,
+              redeploy, and allow your site origin in the Crossmint console. Then sign-in will appear
+              here.
+            </p>
+          ) : crossmintModuleError ? (
+            <div className="rounded-md border border-red-500/25 bg-red-500/10 p-2 text-[11px] leading-snug text-red-200/90">
+              Crossmint SDK did not load: {crossmintModuleError}. Check your connection, ad blockers, and
+              CSP; then hard-refresh. You can still paste a Solana recipient address below.
+            </div>
+          ) : !embeddedWalletReady ? (
+            <div className="space-y-2 rounded-lg border border-white/10 bg-black/30 p-3">
+              <p className="text-xs font-medium text-white/90">Crossmint embedded wallet</p>
+              <p className="text-[11px] opacity-70">Loading Crossmint…</p>
+            </div>
+          ) : (
+            <CrossmintMpcSectionDynamic onRecipientAddress={onCrossmintRecipientAddress} />
+          )}
           <input
             value={mpcWalletAddress}
             onChange={(e) => setMpcWalletAddress(e.target.value)}
-            placeholder="Crossmint MPC wallet address"
+            placeholder="Solana / Crossmint MPC wallet address (manual fallback)"
             className="input input-bordered w-full bg-black/30"
           />
           <a
-            href="https://www.crossmint.com/"
+            href={CROSSMINT_WALLET_HELP_URL}
             target="_blank"
             rel="noreferrer"
             className="text-xs underline opacity-80"
           >
-            Need a Crossmint wallet? Continue on Crossmint
+            Need a Crossmint wallet? Continue here
           </a>
         </div>
       )}

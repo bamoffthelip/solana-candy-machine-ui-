@@ -3,11 +3,12 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { keypairIdentity, publicKey, some, none, Signer } from "@metaplex-foundation/umi";
 import { mplTokenMetadata, findMetadataPda, findMasterEditionPda } from "@metaplex-foundation/mpl-token-metadata";
 import {
-  findLeafAssetIdPda,
   mintToCollectionV1,
   mplBubblegum,
+  parseLeafFromMintToCollectionV1Transaction,
   TokenStandard,
   MetadataArgsArgs,
+  type LeafSchema,
 } from "@metaplex-foundation/mpl-bubblegum";
 import bs58 from "bs58";
 import { formatNftName, getProjectConfigOrFallback } from "../../../lib/project-config";
@@ -19,6 +20,28 @@ const DEFAULT_COLLECTION_MINT =
 const DEFAULT_MERKLE_TREE =
   process.env.CNFT_MERKLE_TREE || "E3Do6eop2Bf2vv3nRCdsaE9uqosYyEaAe3zA1MNQNkUG";
 const AUTHORITY_SECRET_KEY = process.env.CNFT_AUTHORITY_SECRET_KEY;
+
+async function resolveMintedAssetId(
+  umi: Parameters<typeof parseLeafFromMintToCollectionV1Transaction>[0],
+  signature: Uint8Array
+): Promise<{ assetId: string; leafIndex: number }> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    try {
+      const leaf: LeafSchema = await parseLeafFromMintToCollectionV1Transaction(umi, signature);
+      return {
+        assetId: leaf.id.toString(),
+        leafIndex: Number(leaf.nonce),
+      };
+    } catch (err) {
+      lastError = err;
+      await new Promise((resolve) => setTimeout(resolve, 400 * (attempt + 1)));
+    }
+  }
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Could not parse leaf / asset id from mint transaction");
+}
 
 type ClaimMethod = "wallet" | "crossmint-mpc";
 
@@ -88,8 +111,6 @@ export default async function handler(
     const collectionMint = publicKey(project.collectionMint || DEFAULT_COLLECTION_MINT);
     const merkleTree = publicKey(project.merkleTree || DEFAULT_MERKLE_TREE);
 
-    const [assetId] = findLeafAssetIdPda(umi, { merkleTree, leafIndex: mintIndex });
-
     const collectionMetadata = findMetadataPda(umi, { mint: collectionMint });
     const collectionEdition = findMasterEditionPda(umi, { mint: collectionMint });
 
@@ -128,8 +149,13 @@ export default async function handler(
         metadata,
       });
 
-      const result = await tx.sendAndConfirm(umi);
+      // Finalized so Bubblegum leaf schema can be parsed from the confirmed tx.
+      const result = await tx.sendAndConfirm(umi, {
+        confirm: { commitment: "finalized" },
+      });
       const signature = bs58.encode(result.signature);
+      // Asset id comes from the actual tree leaf (nonce), not metadataIndex.
+      const { assetId } = await resolveMintedAssetId(umi, result.signature);
 
       return res.status(200).json({
         success: true,
@@ -138,7 +164,7 @@ export default async function handler(
         signature,
         metadataIndex: mintIndex,
         projectId,
-        assetId: assetId.toString(),
+        assetId,
       });
     } catch (mintError) {
       await releaseReservation(projectId, recipient).catch(() => undefined);

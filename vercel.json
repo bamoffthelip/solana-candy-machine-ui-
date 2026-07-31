@@ -1,10 +1,23 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
+  "regions": ["iad1"],
   "build": {
     "env": {
       "NODE_VERSION": "20"
     }
   },
-  "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npm run build",
-  "framework": "nextjs"
+  "functions": {
+    "src/pages/api/claim.ts": {
+      "maxDuration": 60
+    },
+    "src/pages/api/mint-cnft.ts": {
+      "maxDuration": 60
+    },
+    "src/pages/api/admin/claim-store.ts": {
+      "maxDuration": 15
+    }
+  }
 }

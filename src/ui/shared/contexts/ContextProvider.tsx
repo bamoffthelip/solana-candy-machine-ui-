@@ -5,8 +5,8 @@ import {
     PhantomWalletAdapter,
     SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import { Cluster, clusterApiUrl } from '@solana/web3.js';
-import { FC, ReactNode, useCallback, useMemo } from 'react';
+import { clusterApiUrl } from '@solana/web3.js';
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
 import { notify } from "../../../utils/notifications";
 import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
@@ -21,19 +21,24 @@ const ReactUIWalletModalProviderDynamic = dynamic(
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { autoConnect } = useAutoConnect();
     const { networkConfiguration } = useNetworkConfiguration();
+    const [browserReady, setBrowserReady] = useState(false);
+    useEffect(() => {
+        setBrowserReady(true);
+    }, []);
+
     const network = networkConfiguration as WalletAdapterNetwork;
     const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
-    console.log(network);
-
-    const wallets = useMemo(
-        () => [
+    const wallets = useMemo(() => {
+        if (typeof window === 'undefined') {
+            return [];
+        }
+        return [
             new BackpackWalletAdapter(),
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter(),
-        ],
-        [network]
-    );
+        ];
+    }, [network]);
 
     const onError = useCallback(
         (error: WalletError) => {
@@ -46,7 +51,11 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     return (
         // TODO: updates needed for updating and referencing endpoint: wallet adapter rework
         <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider wallets={wallets} onError={onError} autoConnect={autoConnect}>
+            <WalletProvider
+                wallets={wallets}
+                onError={onError}
+                autoConnect={browserReady && autoConnect}
+            >
                 <ReactUIWalletModalProviderDynamic>
                     {children}
                 </ReactUIWalletModalProviderDynamic>
