@@ -28,12 +28,13 @@ export type ProjectMintConfig = {
 
 const DEFAULT_MEDIA =
   process.env.NEXT_PUBLIC_DEFAULT_MINT_MEDIA ||
-  "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=1400&q=80";
+  "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeih2hdckjt2pkc3chd6zyt3c2muxhfycekfnquvvuop7oyd52kppdi";
 
 const DEFAULT_METADATA_BASE =
   process.env.NEXT_PUBLIC_CNFT_METADATA_URI ||
   process.env.CNFT_METADATA_URI ||
-  "https://gateway.pinata.cloud/ipfs/bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce";
+  "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeih5t3kalgg2hhc73aekty7pjbgxd7egk3pjln63brl3batl7u72yy";
+  
 
 export const PROJECTS: Record<string, ProjectMintConfig> = {
   unify: {
