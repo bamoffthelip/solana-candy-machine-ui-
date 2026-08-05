@@ -45,47 +45,52 @@ export default async function handler(
 ) {
   if (!requireAdmin(req, res)) return;
 
-  const backend = usingRedis ? "redis" : "file";
+  try {
+    const backend = usingRedis ? "redis" : "file";
 
-  if (req.method === "GET") {
-    const rawId = req.query.projectId;
-    const projectId = typeof rawId === "string" && rawId.length > 0 ? rawId : null;
-    const includeWallets = req.query.wallets === "1" || req.query.wallets === "true";
+    if (req.method === "GET") {
+      const rawId = req.query.projectId;
+      const projectId = typeof rawId === "string" && rawId.length > 0 ? rawId : null;
+      const includeWallets = req.query.wallets === "1" || req.query.wallets === "true";
 
-    if (!projectId) {
-      const projects = await listAllProjectStats();
-      return res.status(200).json({ success: true, backend, projects });
+      if (!projectId) {
+        const projects = await listAllProjectStats();
+        return res.status(200).json({ success: true, backend, projects });
+      }
+
+      const stats = await getProjectStats(projectId);
+      if (includeWallets) {
+        const wallets = await listClaimedWallets(projectId);
+        return res.status(200).json({ success: true, backend, projectId, stats, wallets });
+      }
+      return res.status(200).json({ success: true, backend, projectId, stats });
     }
 
-    const stats = await getProjectStats(projectId);
-    if (includeWallets) {
-      const wallets = await listClaimedWallets(projectId);
-      return res.status(200).json({ success: true, backend, projectId, stats, wallets });
+    if (req.method === "POST") {
+      const { projectId, resetCounter, resetClaims, nextIndex } = (req.body || {}) as {
+        projectId?: string;
+        resetCounter?: boolean;
+        resetClaims?: boolean;
+        nextIndex?: number;
+      };
+
+      if (!projectId || typeof projectId !== "string") {
+        return res.status(400).json({ success: false, error: "Missing projectId" });
+      }
+
+      const stats = await resetProject(projectId, {
+        counter: resetCounter !== false,
+        claims: resetClaims !== false,
+        nextIndex,
+      });
+
+      return res.status(200).json({ success: true, backend, projectId, stats });
     }
-    return res.status(200).json({ success: true, backend, projectId, stats });
+
+    res.setHeader("Allow", "GET, POST");
+    return res.status(405).json({ success: false, error: "Method not allowed" });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Claim-store request failed";
+    return res.status(500).json({ success: false, error: msg });
   }
-
-  if (req.method === "POST") {
-    const { projectId, resetCounter, resetClaims, nextIndex } = (req.body || {}) as {
-      projectId?: string;
-      resetCounter?: boolean;
-      resetClaims?: boolean;
-      nextIndex?: number;
-    };
-
-    if (!projectId || typeof projectId !== "string") {
-      return res.status(400).json({ success: false, error: "Missing projectId" });
-    }
-
-    const stats = await resetProject(projectId, {
-      counter: resetCounter !== false,
-      claims: resetClaims !== false,
-      nextIndex,
-    });
-
-    return res.status(200).json({ success: true, backend, projectId, stats });
-  }
-
-  res.setHeader("Allow", "GET, POST");
-  return res.status(405).json({ success: false, error: "Method not allowed" });
 }

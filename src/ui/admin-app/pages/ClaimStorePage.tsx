@@ -35,6 +35,25 @@ function authHeaders(adminKey: string): Record<string, string> {
   };
 }
 
+/** Prefer a clear error when the server returns HTML (auth wall / Next error page). */
+async function readJsonResponse<T>(r: Response): Promise<T> {
+  const text = await r.text();
+  const trimmed = text.trim();
+  if (!trimmed) {
+    throw new Error(`Empty response (HTTP ${r.status})`);
+  }
+  try {
+    return JSON.parse(trimmed) as T;
+  } catch {
+    const snippet = trimmed.slice(0, 120).replace(/\s+/g, " ");
+    throw new Error(
+      `Expected JSON from /api/admin/claim-store but got HTTP ${r.status} ` +
+        `(looks like HTML). Check Deployment Protection / that the API route is deployed. ` +
+        `Body starts with: ${snippet}`
+    );
+  }
+}
+
 const ClaimStorePage: NextPage = () => {
   const [adminKey, setAdminKey] = useState<string>("");
   const [keyDirty, setKeyDirty] = useState(false);
@@ -79,7 +98,7 @@ const ClaimStorePage: NextPage = () => {
       const r = await fetch("/api/admin/claim-store", {
         headers: authHeaders(adminKey),
       });
-      const data = (await r.json()) as ListResp;
+      const data = await readJsonResponse<ListResp>(r);
       if (!r.ok || !data.success) {
         throw new Error("error" in data ? data.error : "Request failed");
       }
@@ -102,7 +121,7 @@ const ClaimStorePage: NextPage = () => {
           `/api/admin/claim-store?projectId=${encodeURIComponent(projectId)}&wallets=1`,
           { headers: authHeaders(adminKey) }
         );
-        const data = (await r.json()) as DetailResp;
+        const data = await readJsonResponse<DetailResp>(r);
         if (!r.ok || !data.success) {
           throw new Error("error" in data ? data.error : "Request failed");
         }
@@ -165,7 +184,7 @@ const ClaimStorePage: NextPage = () => {
           headers: authHeaders(adminKey),
           body: JSON.stringify(body),
         });
-        const data = (await r.json()) as ResetResp;
+        const data = await readJsonResponse<ResetResp>(r);
         if (!r.ok || !data.success) {
           throw new Error("error" in data ? data.error : "Request failed");
         }

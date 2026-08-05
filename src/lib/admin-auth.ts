@@ -22,7 +22,7 @@ function secretsMatch(provided: string, expected: string): boolean {
  * returns false (handler should `return` immediately if it returns false).
  */
 export function requireAdmin(req: NextApiRequest, res: NextApiResponse): boolean {
-  const expected = process.env.CLAIM_ADMIN_KEY;
+  const expected = process.env.CLAIM_ADMIN_KEY?.trim();
   if (!expected) {
     res.status(500).json({
       success: false,
