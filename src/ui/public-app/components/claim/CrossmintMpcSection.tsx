@@ -6,13 +6,20 @@ import {
 
 type CrossmintMpcSectionProps = {
   onRecipientAddress: (address: string) => void;
+  /** When true, emphasize the primary non-crypto CTA (auto-opened path). */
+  emphasizeCta?: boolean;
 };
 
 /**
  * Opens Crossmint auth via `login()` (modal with email/Google). After success, `createOnLogin`
  * provisions a Solana wallet; address is forwarded for `/api/claim` as `mpcWalletAddress`.
+ *
+ * One dialog covers both first-time wallet creation and returning Crossmint sign-in.
  */
-export function CrossmintMpcSection({ onRecipientAddress }: CrossmintMpcSectionProps) {
+export function CrossmintMpcSection({
+  onRecipientAddress,
+  emphasizeCta = false,
+}: CrossmintMpcSectionProps) {
   const { wallet, status: walletStatus } = useCrossmintWallet();
   const auth = useCrossmintAuth();
 
@@ -25,11 +32,13 @@ export function CrossmintMpcSection({ onRecipientAddress }: CrossmintMpcSectionP
 
   return (
     <div className="space-y-3 rounded-lg border border-white/10 bg-black/30 p-3">
-      <p className="text-xs font-medium text-white/90">Crossmint embedded wallet</p>
+      <p className="text-xs font-medium text-white/90">
+        {emphasizeCta ? "Create or sign in to a free wallet" : "Email / Google wallet"}
+      </p>
       <p className="text-[11px] leading-snug opacity-70">
-        Use the button below to open Crossmint&apos;s sign-in window—there you can choose email or Google.
-        This page does not show Google/email fields inline. After sign-in, your Solana recipient address
-        appears here for Claim NFT (or paste an address manually below).
+        Sign in with Crossmint using email or Google. If you&apos;re new, a Solana wallet is created
+        automatically. If you already have a Crossmint account, you&apos;ll use that same wallet.
+        Everything happens in the Crossmint window—you never leave this page.
       </p>
 
       {auth.status === "logged-in" && walletStatus === "in-progress" ? (
@@ -38,22 +47,32 @@ export function CrossmintMpcSection({ onRecipientAddress }: CrossmintMpcSectionP
 
       {wallet?.address ? (
         <div className="rounded-md border border-emerald-500/20 bg-emerald-500/5 p-2 text-xs">
-          <span className="opacity-70">Recipient address</span>
+          <span className="opacity-70">Your wallet is ready — claim below</span>
           <p className="mt-1 break-all font-mono text-emerald-200/90">{wallet.address}</p>
+          {auth.user?.email ? (
+            <p className="mt-1 text-[10px] opacity-60">Signed in as {auth.user.email}</p>
+          ) : null}
         </div>
       ) : (
         <div className="space-y-2">
           <button
             type="button"
-            className="btn btn-secondary btn-sm w-full border border-white/20 bg-white/10 text-white hover:bg-white/20"
+            className={
+              emphasizeCta
+                ? "btn btn-primary btn-sm w-full"
+                : "btn btn-secondary btn-sm w-full border border-white/20 bg-white/10 text-white hover:bg-white/20"
+            }
             disabled={authBusy || auth.status === "logged-in"}
             onClick={() => auth.login()}
           >
-            {authBusy ? "Please wait…" : "Sign in with Crossmint"}
+            {authBusy
+              ? "Please wait…"
+              : emphasizeCta
+                ? "Don't have a crypto wallet? Click here"
+                : "Sign in with Crossmint"}
           </button>
           <p className="text-[10px] leading-snug opacity-55">
-            Opens Crossmint&apos;s sign-in dialog (hosted by Crossmint). After you finish, your wallet
-            address loads above automatically.
+            Opens Crossmint&apos;s sign-in dialog. New and returning users use the same button.
           </p>
         </div>
       )}
