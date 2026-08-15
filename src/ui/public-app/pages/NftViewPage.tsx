@@ -27,7 +27,8 @@ const NftViewPage: NextPage = () => {
             Claim NFT
           </h1>
           <p className="mt-2 text-sm opacity-75">
-            View campaign NFT details and claim with connected wallet or Crossmint MPC fallback.
+            Claim this promo NFT with email/Google (no crypto wallet needed) or with a connected
+            Solana wallet.
           </p>
         </div>
 

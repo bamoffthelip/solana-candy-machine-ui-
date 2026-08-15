@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useState } from "react";
 import { getProjectConfigOrFallback } from "../../../../lib/project-config";
-import { CROSSMINT_WALLET_HELP_URL } from "../../../../lib/crossmint-links";
 import { useCrossmintEmbedded } from "../../../shared/contexts/crossmint-embedded-context";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
@@ -34,7 +33,7 @@ const CrossmintMpcSectionDynamic = dynamic(
     ssr: false,
     loading: () => (
       <div className="space-y-2 rounded-lg border border-white/10 bg-black/30 p-3">
-        <p className="text-xs font-medium text-white/90">Crossmint embedded wallet</p>
+        <p className="text-xs font-medium text-white/90">Email / Google wallet</p>
         <p className="text-[11px] opacity-70">Loading sign-in…</p>
       </div>
     ),
@@ -58,15 +57,17 @@ type ClaimResult = {
   recipient?: string;
   signature?: string;
   metadataIndex?: number;
-  assetId?: string; 
+  assetId?: string;
   error?: string;
 };
 
 export function ClaimFlow({ projectId }: ClaimFlowProps) {
   const { embeddedWalletReady, crossmintModuleError } = useCrossmintEmbedded();
   const wallet = useWallet();
-  const [method, setMethod] = useState<ClaimMethod>("wallet");
+  /** Default to Crossmint path — primary onboarding for non-crypto users. */
+  const [method, setMethod] = useState<ClaimMethod>("crossmint-mpc");
   const [mpcWalletAddress, setMpcWalletAddress] = useState("");
+  const [showManualAddress, setShowManualAddress] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<ClaimResult | null>(null);
   const [error, setError] = useState("");
@@ -74,6 +75,8 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
     mintAddress: string;
     metadataIndex: number;
     imageUrl: string;
+    claimMethod: ClaimMethod;
+    recipient: string;
   }>(null);
   const [turnstileToken, setTurnstileToken] = useState<string>("");
   const onTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
@@ -125,18 +128,25 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
         /* keep projectCfg.mediaUrl */
       }
 
+      const recipient =
+        method === "wallet"
+          ? wallet.publicKey?.toBase58() || body.recipient || ""
+          : mpcWalletAddress.trim() || body.recipient || "";
+
       setSuccess({
         mintAddress: body.assetId!,
         metadataIndex: body.metadataIndex!,
         imageUrl,
+        claimMethod: method,
+        recipient,
       });
-
     } catch (e: any) {
       setError(e?.message || "Unable to complete claim");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   if (success) {
     return (
       <ClaimSuccess
@@ -144,42 +154,52 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
         metadataIndex={success.metadataIndex}
         projectId={projectId}
         imageUrl={success.imageUrl}
+        claimMethod={success.claimMethod}
+        recipient={success.recipient}
       />
     );
   }
-    return (
+
+  return (
     <div className="space-y-4 rounded-xl border border-white/10 bg-black/20 p-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold">Claim method</p>
-        <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-sm" />
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold">How do you want to claim?</p>
+        {method === "wallet" ? (
+          <WalletMultiButtonDynamic className="btn-ghost btn-sm rounded-btn text-sm" />
+        ) : null}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2">
         <button
           type="button"
-          className={`btn btn-sm ${method === "wallet" ? "btn-primary" : "btn-ghost border border-white/20"}`}
-          onClick={() => setMethod("wallet")}
+          className={`btn btn-sm w-full justify-start ${
+            method === "crossmint-mpc" ? "btn-primary" : "btn-ghost border border-white/20"
+          }`}
+          onClick={() => setMethod("crossmint-mpc")}
         >
-          Connected Wallet
+          Don&apos;t have a crypto wallet? Use email / Google
         </button>
         <button
           type="button"
-          className={`btn btn-sm ${method === "crossmint-mpc" ? "btn-primary" : "btn-ghost border border-white/20"}`}
-          onClick={() => setMethod("crossmint-mpc")}
+          className={`btn btn-sm w-full justify-start ${
+            method === "wallet" ? "btn-primary" : "btn-ghost border border-white/20"
+          }`}
+          onClick={() => setMethod("wallet")}
         >
-          Crossmint MPC Fallback
+          I already have a wallet (Phantom, Solflare, …)
         </button>
       </div>
 
       {method === "wallet" ? (
         <p className="text-xs opacity-75">
-          Supports connected wallet claims (Phantom, Solflare, Backpack via wallet adapter).
+          Connect Phantom, Solflare, Backpack, or another Solana wallet with the button above, then
+          claim.
         </p>
       ) : (
         <div className="space-y-2">
           <p className="text-xs opacity-75">
-            Use an embedded Crossmint Solana wallet (below) or paste any valid Solana recipient address
-            (including a Crossmint MPC address from the Crossmint console).
+            No app install needed. Sign in with email or Google to create a free wallet (or reopen an
+            existing Crossmint wallet), then claim your NFT into it.
           </p>
           {!CROSSMINT_CLIENT_KEY ? (
             <p className="rounded-md border border-amber-500/20 bg-amber-500/5 p-2 text-[11px] leading-snug text-amber-100/90">
@@ -195,26 +215,31 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
             </div>
           ) : !embeddedWalletReady ? (
             <div className="space-y-2 rounded-lg border border-white/10 bg-black/30 p-3">
-              <p className="text-xs font-medium text-white/90">Crossmint embedded wallet</p>
+              <p className="text-xs font-medium text-white/90">Email / Google wallet</p>
               <p className="text-[11px] opacity-70">Loading Crossmint…</p>
             </div>
           ) : (
-            <CrossmintMpcSectionDynamic onRecipientAddress={onCrossmintRecipientAddress} />
+            <CrossmintMpcSectionDynamic
+              onRecipientAddress={onCrossmintRecipientAddress}
+              emphasizeCta
+            />
           )}
-          <input
-            value={mpcWalletAddress}
-            onChange={(e) => setMpcWalletAddress(e.target.value)}
-            placeholder="Solana / Crossmint MPC wallet address (manual fallback)"
-            className="input input-bordered w-full bg-black/30"
-          />
-          <a
-            href={CROSSMINT_WALLET_HELP_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="text-xs underline opacity-80"
+
+          <button
+            type="button"
+            className="text-[11px] underline opacity-60 hover:opacity-90"
+            onClick={() => setShowManualAddress((v) => !v)}
           >
-            Need a Crossmint wallet? Continue here
-          </a>
+            {showManualAddress ? "Hide manual address" : "Paste a wallet address instead"}
+          </button>
+          {showManualAddress ? (
+            <input
+              value={mpcWalletAddress}
+              onChange={(e) => setMpcWalletAddress(e.target.value)}
+              placeholder="Solana wallet address"
+              className="input input-bordered w-full bg-black/30"
+            />
+          ) : null}
         </div>
       )}
 
@@ -240,4 +265,3 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
     </div>
   );
 }
-

@@ -28,6 +28,8 @@ interface ClaimBackend {
     startFrom: number
   ): Promise<{ metadataIndex: number }>;
   releaseReservation(projectId: string, walletAddress: string): Promise<void>;
+  /** Remove wallet from claim guard only — does not change the mint counter. */
+  removeClaimedWallet(projectId: string, walletAddress: string): Promise<boolean>;
   getProjectStats(projectId: string): Promise<ProjectStats>;
   listAllProjectStats(): Promise<ProjectStats[]>;
   listClaimedWallets(projectId: string): Promise<string[]>;
@@ -121,6 +123,15 @@ class FileBackend implements ClaimBackend {
       state.counters[projectId] -= 1;
     }
     this.save(state);
+  }
+
+  async removeClaimedWallet(projectId: string, wallet: string): Promise<boolean> {
+    const state = this.load();
+    const list = state.claimsByProject[projectId] || [];
+    if (!list.includes(wallet)) return false;
+    state.claimsByProject[projectId] = list.filter((w) => w !== wallet);
+    this.save(state);
+    return true;
   }
 
   async getProjectStats(projectId: string): Promise<ProjectStats> {
@@ -241,6 +252,11 @@ class RedisBackend implements ClaimBackend {
     await pipe.exec();
   }
 
+  async removeClaimedWallet(projectId: string, wallet: string): Promise<boolean> {
+    const removed = await this.redis.srem(this.walletsKey(projectId), wallet);
+    return Number(removed) > 0;
+  }
+
   async getProjectStats(projectId: string): Promise<ProjectStats> {
     const [counter, count] = await Promise.all([
       this.redis.get<string | number | null>(this.counterKey(projectId)),
@@ -327,6 +343,14 @@ export function releaseReservation(
   walletAddress: string
 ): Promise<void> {
   return backend.releaseReservation(projectId, walletAddress);
+}
+
+/** Allow a wallet to claim again without changing nextIndex. Returns false if not in list. */
+export function removeClaimedWallet(
+  projectId: string,
+  walletAddress: string
+): Promise<boolean> {
+  return backend.removeClaimedWallet(projectId, walletAddress);
 }
 
 export function getProjectStats(projectId: string): Promise<ProjectStats> {

@@ -1,11 +1,14 @@
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
+import { CROSSMINT_USER_COLLECTION_URL } from "../../../../lib/crossmint-links";
 
 type ClaimSuccessProps = {
   mintAddress: string;
   metadataIndex: number;
   projectId: string;
-  imageUrl: string; // resolved from metadata
+  imageUrl: string;
+  claimMethod?: "wallet" | "crossmint-mpc";
+  recipient?: string;
 };
 
 export function ClaimSuccess({
@@ -13,9 +16,10 @@ export function ClaimSuccess({
   metadataIndex,
   projectId,
   imageUrl,
+  claimMethod,
+  recipient,
 }: ClaimSuccessProps) {
   useEffect(() => {
-    // Subtle confetti burst
     confetti({
       particleCount: 80,
       spread: 60,
@@ -26,11 +30,12 @@ export function ClaimSuccess({
 
   const solscanUrl = `https://solscan.io/token/${mintAddress}`;
   const metadataUrl = `/public/nft/metadata/${metadataIndex}?projectId=${projectId}`;
+  const isCrossmintClaim = claimMethod === "crossmint-mpc";
 
   return (
     <div className="w-full max-w-xl mx-auto text-center mt-10">
       <h2 className="text-3xl font-bold bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
-        🎉 NFT Claimed Successfully
+        NFT Claimed Successfully
       </h2>
 
       <p className="mt-2 text-sm opacity-75">
@@ -46,11 +51,36 @@ export function ClaimSuccess({
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
+        {isCrossmintClaim ? (
+          <div className="rounded-lg border border-white/15 bg-black/30 p-4 text-left space-y-3">
+            <p className="text-sm font-medium text-white/90">Access your wallet anytime</p>
+            <p className="text-xs leading-snug opacity-70">
+              Open Crossmint&apos;s collection page and sign in with the <strong>same email or
+              Google</strong> you just used. Bookmark that page so you can find your NFT later.
+            </p>
+            {recipient ? (
+              <p className="text-[10px] font-mono break-all opacity-55">Wallet: {recipient}</p>
+            ) : null}
+            <a
+              href={CROSSMINT_USER_COLLECTION_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition text-sm font-medium"
+            >
+              Open Crossmint wallet
+            </a>
+          </div>
+        ) : null}
+
         <a
           href={solscanUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+          className={`px-4 py-2 rounded-lg text-white transition ${
+            isCrossmintClaim
+              ? "bg-white/10 hover:bg-white/20 border border-white/15"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
         >
           View on Solscan
         </a>
@@ -63,11 +93,6 @@ export function ClaimSuccess({
         >
           View Metadata
         </a>
-
-        {/* Placeholder for Step 3 */}
-        <div className="mt-4">
-          <div className="opacity-60 text-sm">Share component coming next…</div>
-        </div>
 
         <a
           href={`/claim/${projectId}`}
