@@ -13,6 +13,7 @@ import {
 import bs58 from "bs58";
 import { formatNftName, getProjectConfigOrFallback } from "../../../lib/project-config";
 import { releaseReservation, reserveClaim } from "../../../lib/claim-store";
+import { isValidEmail, sendClaimCompleteEmail } from "../../../lib/send-claim-email";
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
 const DEFAULT_COLLECTION_MINT =
@@ -52,7 +53,9 @@ type ResponseData = {
   signature?: string;
   metadataIndex?: number;
   projectId?: string;
-  assetId?: string;   // ⭐ added
+  assetId?: string;
+  /** Present after Crossmint MPC claims when an email was attempted or skipped. */
+  emailSent?: boolean;
   error?: string;
 };
 
@@ -64,11 +67,20 @@ export default async function handler(
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  const { projectId: rawProjectId, walletAddress, mpcWalletAddress } = req.body || {};
+  const {
+    projectId: rawProjectId,
+    walletAddress,
+    mpcWalletAddress,
+    recipientEmail: rawRecipientEmail,
+  } = req.body || {};
 
   const projectId = typeof rawProjectId === "string" && rawProjectId.length > 0 ? rawProjectId : "unify";
   const recipient = walletAddress || mpcWalletAddress;
   const claimMethod: ClaimMethod = walletAddress ? "wallet" : "crossmint-mpc";
+  const recipientEmail =
+    claimMethod === "crossmint-mpc" && isValidEmail(rawRecipientEmail)
+      ? String(rawRecipientEmail).trim().toLowerCase()
+      : null;
 
   if (!recipient || typeof recipient !== "string") {
     return res.status(400).json({
@@ -157,6 +169,23 @@ export default async function handler(
       // Asset id comes from the actual tree leaf (nonce), not metadataIndex.
       const { assetId } = await resolveMintedAssetId(umi, result.signature);
 
+      let emailSent = false;
+      if (claimMethod === "crossmint-mpc" && recipientEmail) {
+        const emailResult = await sendClaimCompleteEmail({
+          to: recipientEmail,
+          nftName,
+          projectId,
+          walletAddress: recipient,
+          assetId,
+          metadataIndex: mintIndex,
+        });
+        if (emailResult.sent) {
+          emailSent = true;
+        } else {
+          console.warn("[api/claim] claim email not sent:", emailResult.reason);
+        }
+      }
+
       return res.status(200).json({
         success: true,
         claimMethod,
@@ -165,6 +194,7 @@ export default async function handler(
         metadataIndex: mintIndex,
         projectId,
         assetId,
+        ...(claimMethod === "crossmint-mpc" ? { emailSent } : {}),
       });
     } catch (mintError) {
       await releaseReservation(projectId, recipient).catch(() => undefined);

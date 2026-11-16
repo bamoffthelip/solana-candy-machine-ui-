@@ -6,6 +6,8 @@ import {
 
 type CrossmintMpcSectionProps = {
   onRecipientAddress: (address: string) => void;
+  /** Crossmint auth email (for claim confirmation). Cleared on logout. */
+  onRecipientEmail?: (email: string) => void;
   /** When true, emphasize the primary non-crypto CTA (auto-opened path). */
   emphasizeCta?: boolean;
 };
@@ -18,6 +20,7 @@ type CrossmintMpcSectionProps = {
  */
 export function CrossmintMpcSection({
   onRecipientAddress,
+  onRecipientEmail,
   emphasizeCta = false,
 }: CrossmintMpcSectionProps) {
   const { wallet, status: walletStatus } = useCrossmintWallet();
@@ -26,6 +29,10 @@ export function CrossmintMpcSection({
   useEffect(() => {
     onRecipientAddress(wallet?.address ?? "");
   }, [wallet?.address, onRecipientAddress]);
+
+  useEffect(() => {
+    onRecipientEmail?.(auth.user?.email ?? "");
+  }, [auth.user?.email, onRecipientEmail]);
 
   const authBusy =
     auth.status === "initializing" || auth.status === "in-progress";

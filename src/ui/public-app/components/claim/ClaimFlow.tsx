@@ -58,6 +58,7 @@ type ClaimResult = {
   signature?: string;
   metadataIndex?: number;
   assetId?: string;
+  emailSent?: boolean;
   error?: string;
 };
 
@@ -67,6 +68,7 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
   /** Default to Crossmint path — primary onboarding for non-crypto users. */
   const [method, setMethod] = useState<ClaimMethod>("crossmint-mpc");
   const [mpcWalletAddress, setMpcWalletAddress] = useState("");
+  const [mpcRecipientEmail, setMpcRecipientEmail] = useState("");
   const [showManualAddress, setShowManualAddress] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<ClaimResult | null>(null);
@@ -77,11 +79,15 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
     imageUrl: string;
     claimMethod: ClaimMethod;
     recipient: string;
+    emailSent?: boolean;
   }>(null);
   const [turnstileToken, setTurnstileToken] = useState<string>("");
   const onTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
   const onCrossmintRecipientAddress = useCallback((addr: string) => {
     setMpcWalletAddress(addr);
+  }, []);
+  const onCrossmintRecipientEmail = useCallback((email: string) => {
+    setMpcRecipientEmail(email);
   }, []);
 
   const turnstileRequired = Boolean(TURNSTILE_SITE_KEY);
@@ -98,7 +104,13 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
       const base =
         method === "wallet"
           ? { projectId, walletAddress: wallet.publicKey?.toBase58() }
-          : { projectId, mpcWalletAddress: mpcWalletAddress.trim() };
+          : {
+              projectId,
+              mpcWalletAddress: mpcWalletAddress.trim(),
+              ...(mpcRecipientEmail.trim()
+                ? { recipientEmail: mpcRecipientEmail.trim() }
+                : {}),
+            };
       const payload = turnstileToken ? { ...base, turnstileToken } : base;
 
       const response = await fetch("/api/claim", {
@@ -139,6 +151,7 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
         imageUrl,
         claimMethod: method,
         recipient,
+        emailSent: body.emailSent,
       });
     } catch (e: any) {
       setError(e?.message || "Unable to complete claim");
@@ -156,6 +169,7 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
         imageUrl={success.imageUrl}
         claimMethod={success.claimMethod}
         recipient={success.recipient}
+        emailSent={success.emailSent}
       />
     );
   }
@@ -221,6 +235,7 @@ export function ClaimFlow({ projectId }: ClaimFlowProps) {
           ) : (
             <CrossmintMpcSectionDynamic
               onRecipientAddress={onCrossmintRecipientAddress}
+              onRecipientEmail={onCrossmintRecipientEmail}
               emphasizeCta
             />
           )}

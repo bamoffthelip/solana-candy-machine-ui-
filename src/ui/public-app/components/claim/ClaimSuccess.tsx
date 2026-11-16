@@ -9,6 +9,7 @@ type ClaimSuccessProps = {
   imageUrl: string;
   claimMethod?: "wallet" | "crossmint-mpc";
   recipient?: string;
+  emailSent?: boolean;
 };
 
 export function ClaimSuccess({
@@ -18,6 +19,7 @@ export function ClaimSuccess({
   imageUrl,
   claimMethod,
   recipient,
+  emailSent,
 }: ClaimSuccessProps) {
   useEffect(() => {
     confetti({
@@ -40,6 +42,9 @@ export function ClaimSuccess({
 
       <p className="mt-2 text-sm opacity-75">
         Your Unify Genesis Promo cNFT has been minted and is now yours.
+        {isCrossmintClaim && emailSent
+          ? " We also sent a confirmation email with a link to open your wallet."
+          : null}
       </p>
 
       <div className="mt-6">
@@ -59,7 +64,18 @@ export function ClaimSuccess({
               Google</strong> you just used. Bookmark that page so you can find your NFT later.
             </p>
             {recipient ? (
-              <p className="text-[10px] font-mono break-all opacity-55">Wallet: {recipient}</p>
+              <p className="text-[10px] leading-snug opacity-55">
+                <span className="font-mono break-all">Wallet: {recipient}</span>
+                {" · "}
+                <a
+                  href={`https://solscan.io/account/${recipient}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline opacity-80 hover:opacity-100"
+                >
+                  View this wallet on Solscan
+                </a>
+              </p>
             ) : null}
             <a
               href={CROSSMINT_USER_COLLECTION_URL}
