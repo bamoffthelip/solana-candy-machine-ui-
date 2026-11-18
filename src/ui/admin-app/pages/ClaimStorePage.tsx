@@ -26,6 +26,18 @@ type ResetResp =
   | { success: true; backend: "redis" | "file"; projectId: string; stats: ProjectStats }
   | { success: false; error: string };
 
+type RemoveWalletResp =
+  | {
+      success: true;
+      backend: "redis" | "file";
+      projectId: string;
+      stats: ProjectStats;
+      wallets?: string[];
+      removed: boolean;
+      walletAddress: string;
+    }
+  | { success: false; error: string };
+
 const ADMIN_KEY_STORAGE = "unify_admin_key";
 
 function authHeaders(adminKey: string): Record<string, string> {
@@ -63,6 +75,8 @@ const ClaimStorePage: NextPage = () => {
   const [detail, setDetail] = useState<DetailResp | null>(null);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [removingWallet, setRemovingWallet] = useState<string | null>(null);
+  const [removeMessage, setRemoveMessage] = useState<string>("");
   const [resetForm, setResetForm] = useState({
     projectId: "",
     nextIndex: "",
@@ -146,6 +160,61 @@ const ClaimStorePage: NextPage = () => {
     else setDetail(null);
   }, [selectedId, fetchDetail]);
 
+  const removeWallet = useCallback(
+    async (projectId: string, walletAddress: string) => {
+      if (!adminKey) {
+        setError("Admin key required");
+        return;
+      }
+      const short =
+        walletAddress.length > 12
+          ? `${walletAddress.slice(0, 4)}…${walletAddress.slice(-4)}`
+          : walletAddress;
+      const ok = window.confirm(
+        `Remove ${short} from the claim list for "${projectId}"?\n\n` +
+          `This lets that wallet claim again. The mint counter (next #) is not changed.`
+      );
+      if (!ok) return;
+
+      setRemovingWallet(walletAddress);
+      setError("");
+      setRemoveMessage("");
+      try {
+        const r = await fetch("/api/admin/claim-store", {
+          method: "POST",
+          headers: authHeaders(adminKey),
+          body: JSON.stringify({
+            action: "removeWallet",
+            projectId,
+            walletAddress,
+          }),
+        });
+        const data = await readJsonResponse<RemoveWalletResp>(r);
+        if (!r.ok || !data.success) {
+          throw new Error("error" in data ? data.error : "Request failed");
+        }
+        setRemoveMessage(
+          data.removed
+            ? `Removed ${short} — they can claim again (next # still ${data.stats.nextIndex ?? "—"})`
+            : `${short} was not on the claim list`
+        );
+        setDetail({
+          success: true,
+          backend: data.backend,
+          projectId: data.projectId,
+          stats: data.stats,
+          wallets: data.wallets,
+        });
+        await fetchProjects();
+      } catch (e: any) {
+        setError(e?.message || "Remove failed");
+      } finally {
+        setRemovingWallet(null);
+      }
+    },
+    [adminKey, fetchProjects]
+  );
+
   const submitReset = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -172,6 +241,7 @@ const ClaimStorePage: NextPage = () => {
       try {
         const body: Record<string, unknown> = {
           projectId,
+          action: "reset",
           resetCounter: resetForm.resetCounter,
           resetClaims: resetForm.resetClaims,
         };
@@ -348,14 +418,32 @@ const ClaimStorePage: NextPage = () => {
                 </p>
                 <div className="mt-3">
                   <p className="mb-1 text-sm font-semibold">Claimed wallets</p>
+                  <p className="mb-2 text-[11px] opacity-60">
+                    Remove a wallet to let that address claim again (mint counter unchanged — good for
+                    repeat UX testing).
+                  </p>
+                  {removeMessage ? (
+                    <p className="mb-2 text-xs text-emerald-300">{removeMessage}</p>
+                  ) : null}
                   <div className="max-h-72 overflow-auto rounded-lg border border-white/10 bg-black/30 p-2">
                     {(detail.wallets || []).length === 0 ? (
                       <p className="text-xs opacity-60">No wallets yet.</p>
                     ) : (
-                      <ul className="space-y-1 text-xs font-mono">
+                      <ul className="space-y-2 text-xs">
                         {(detail.wallets || []).map((w) => (
-                          <li key={w} className="break-all">
-                            {w}
+                          <li
+                            key={w}
+                            className="flex items-start justify-between gap-2 border-b border-white/5 pb-2 last:border-0 last:pb-0"
+                          >
+                            <span className="break-all font-mono">{w}</span>
+                            <button
+                              type="button"
+                              className="btn btn-xs shrink-0 border border-white/20 bg-black/40"
+                              disabled={!adminKey || removingWallet === w || loading}
+                              onClick={() => void removeWallet(detail.projectId, w)}
+                            >
+                              {removingWallet === w ? "…" : "Remove"}
+                            </button>
                           </li>
                         ))}
                       </ul>
@@ -372,7 +460,7 @@ const ClaimStorePage: NextPage = () => {
           <h2 className="text-lg font-semibold text-amber-300">Reset project</h2>
           <p className="mt-1 text-xs opacity-80">
             Use BEFORE launching a campaign. Doing this after the first real claim risks duplicating
-            on-chain #N.
+            on-chain #N. Prefer &quot;Remove&quot; on a single wallet for testing.
           </p>
           <form onSubmit={submitReset} className="mt-3 grid gap-3 md:grid-cols-2">
             <div>
