@@ -115,7 +115,11 @@ export default async function handler(
     const metadataUri = `${baseUri}/${mintIndex}.json`;
     const nftName = formatNftName(project.nftNameTemplate, mintIndex);
 
-    const umi = createUmi(RPC_ENDPOINT).use(mplTokenMetadata()).use(mplBubblegum());
+    // "confirmed" also applies to the getTransaction behind resolveMintedAssetId; the web3.js
+    // default of "finalized" would make that lookup wait ~13s for the leaf to show up.
+    const umi = createUmi(RPC_ENDPOINT, "confirmed")
+      .use(mplTokenMetadata())
+      .use(mplBubblegum());
     const secretKeyBytes = bs58.decode(AUTHORITY_SECRET_KEY);
     const authorityKeypair = umi.eddsa.createKeypairFromSecretKey(secretKeyBytes);
     umi.use(keypairIdentity(authorityKeypair));
@@ -161,9 +165,8 @@ export default async function handler(
         metadata,
       });
 
-      // Finalized so Bubblegum leaf schema can be parsed from the confirmed tx.
       const result = await tx.sendAndConfirm(umi, {
-        confirm: { commitment: "finalized" },
+        confirm: { commitment: "confirmed" },
       });
       const signature = bs58.encode(result.signature);
       // Asset id comes from the actual tree leaf (nonce), not metadataIndex.
