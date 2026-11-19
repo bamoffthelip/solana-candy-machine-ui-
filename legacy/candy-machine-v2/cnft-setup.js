@@ -5,7 +5,7 @@ const { createNft, mplTokenMetadata } = require('@metaplex-foundation/mpl-token-
 const fs = require('fs');
 
 // Setup UMI
-const umi = createUmi('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b')
+const umi = createUmi(process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com')
   .use(mplTokenMetadata());
 
 // Load wallet

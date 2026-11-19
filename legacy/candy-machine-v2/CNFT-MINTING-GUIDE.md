@@ -137,7 +137,7 @@ cat ~/working/solana-candy-machine-ui-/candy-machine-v2/cnft-tree-v2.json
 Use Helius API to check a cNFT:
 
 ```bash
-curl -s -X POST 'https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b' \
+curl -s -X POST 'https://mainnet.helius-rpc.com/?api-key=$HELIUS_API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
     "jsonrpc": "2.0",
@@ -152,7 +152,7 @@ curl -s -X POST 'https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f
 To see all cNFTs owned by a wallet:
 
 ```bash
-curl -s -X POST 'https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b' \
+curl -s -X POST 'https://mainnet.helius-rpc.com/?api-key=$HELIUS_API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
     "jsonrpc": "2.0",

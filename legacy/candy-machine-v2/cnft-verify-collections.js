@@ -6,7 +6,7 @@ const { dasApi } = require('@metaplex-foundation/digital-asset-standard-api');
 const fs = require('fs');
 
 // Setup UMI with Bubblegum and DAS API
-const umi = createUmi('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b')
+const umi = createUmi(process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com')
   .use(mplTokenMetadata())
   .use(mplBubblegum())
   .use(dasApi());
@@ -34,7 +34,7 @@ async function verifyCompressedNFTCollections() {
   const treeAuthority = umiKeypair.publicKey;
 
   // Search by creator (our wallet) to find our cNFTs
-  const searchResponse = await fetch('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b', {
+  const searchResponse = await fetch((process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -95,7 +95,7 @@ async function verifyCompressedNFTCollections() {
       console.log(`  Owner: ${nft.ownership.owner.substring(0, 20)}...`);
 
       // Get the asset proof from Helius
-      const proofResponse = await fetch('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b', {
+      const proofResponse = await fetch((process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

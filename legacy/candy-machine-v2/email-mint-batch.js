@@ -37,7 +37,7 @@ const CROSSMINT_ENV = 'production'; // Using production for mainnet
 const crossmint = CROSSMINT_CONFIG[CROSSMINT_ENV];
 
 const METADATA_FOLDER_CID = 'bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44wjpca4tce';
-const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b';
+const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 
 // Delay between mints (ms) to avoid rate limiting
 const MINT_DELAY = 2000;

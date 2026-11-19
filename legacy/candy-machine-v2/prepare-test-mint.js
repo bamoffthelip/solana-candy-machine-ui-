@@ -4,7 +4,7 @@ const { createNft, mplTokenMetadata } = require('@metaplex-foundation/mpl-token-
 const fs = require('fs');
 
 // Setup UMI
-const umi = createUmi('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b')
+const umi = createUmi(process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com')
   .use(mplTokenMetadata());
 
 // Load keypair
@@ -68,7 +68,7 @@ if (!folderCID) {
   process.exit(1);
 }
 
-const umi = createUmi('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b')
+const umi = createUmi(process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com')
   .use(mplTokenMetadata());
 
 const keypairFile = fs.readFileSync(\`\${process.env.HOME}/.config/solana/id.json\`, 'utf8');

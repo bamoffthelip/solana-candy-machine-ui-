@@ -12,7 +12,7 @@ const secretKey = Uint8Array.from(keypairArray);
 const addresses = fs.readFileSync('addresses-remaining.txt', 'utf8').trim().split('\n').filter(a => a.trim());
 
 // Setup UMI
-const umi = createUmi('https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b')
+const umi = createUmi(process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com')
   .use(mplTokenMetadata());
 
 // Convert Solana keypair to UMI format

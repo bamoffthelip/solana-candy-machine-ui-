@@ -52,7 +52,7 @@ const METADATA_FOLDER_CID = 'bafybeih6h2vabvwciu3kth6jwzrug7sgrnlaidhrxv7wldi44w
 // Example: 'bafybeiascws7hnrbos6f7nimovkhpmyyocpw26aof4tld2sjf6mj3qlwti'
 
 // Helius RPC (your existing one)
-const RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=ad915729-b516-4e10-8e2f-57656ff6ee3b';
+const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 
 // =============================================================================
 // SETUP UMI
