@@ -24,6 +24,12 @@ export type ProjectMintConfig = {
   merkleTree?: string;
   /** First index to use for metadata filenames when server assigns the next index (env can override). */
   defaultStartMetadataIndex: number;
+  /**
+   * Highest metadata index that exists in `metadataBaseUri` (inclusive).
+   * Claims stop once the counter passes it, so a campaign can never mint an
+   * NFT whose `{index}.json` would 404. Omit for an uncapped campaign.
+   */
+  maxMetadataIndex?: number;
 };
 
 const DEFAULT_MEDIA =
@@ -53,6 +59,7 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
     nftNameTemplate: "Unify NFT #{index}",
     symbol: "UNIFY",
     defaultStartMetadataIndex: 13,
+    maxMetadataIndex: 200,
   },
   demo: {
     id: "demo",
@@ -86,7 +93,10 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
       process.env.NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI || DEFAULT_METADATA_BASE,
     nftNameTemplate: "Unify Genesis Promo #{index}",
     symbol: "UNIFY",
+    mediaType: "video",
     defaultStartMetadataIndex: 1,
+    // Limited edition: indexes 1..100 only.
+    maxMetadataIndex: 100,
   },
 };
 

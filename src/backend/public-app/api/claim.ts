@@ -12,7 +12,7 @@ import {
 } from "@metaplex-foundation/mpl-bubblegum";
 import bs58 from "bs58";
 import { formatNftName, getProjectConfigOrFallback } from "../../../lib/project-config";
-import { releaseReservation, reserveClaim } from "../../../lib/claim-store";
+import { CAMPAIGN_FULL_MESSAGE, releaseReservation, reserveClaim } from "../../../lib/claim-store";
 import { isValidEmail, sendClaimCompleteEmail } from "../../../lib/send-claim-email";
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
@@ -108,7 +108,8 @@ export default async function handler(
     const { metadataIndex: mintIndex } = await reserveClaim(
       projectId,
       recipient,
-      project.defaultStartMetadataIndex
+      project.defaultStartMetadataIndex,
+      project.maxMetadataIndex
     );
 
     const baseUri = project.metadataBaseUri.replace(/\/$/, "");
@@ -207,6 +208,9 @@ export default async function handler(
     const msg = error?.message || "Unknown claim error occurred";
     if (typeof msg === "string" && msg.includes("already claimed")) {
       return res.status(400).json({ success: false, error: msg });
+    }
+    if (msg === CAMPAIGN_FULL_MESSAGE) {
+      return res.status(409).json({ success: false, error: msg });
     }
     return res.status(500).json({
       success: false,

@@ -20,12 +20,16 @@ export type ProjectStats = {
   claimsCount: number;
 };
 
+/** Thrown when a campaign has handed out every index it has metadata for. */
+export const CAMPAIGN_FULL_MESSAGE = "This campaign is fully claimed.";
+
 interface ClaimBackend {
   hasWalletClaimed(projectId: string, walletAddress: string): Promise<boolean>;
   reserveClaim(
     projectId: string,
     walletAddress: string,
-    startFrom: number
+    startFrom: number,
+    maxIndex?: number
   ): Promise<{ metadataIndex: number }>;
   releaseReservation(projectId: string, walletAddress: string): Promise<void>;
   /** Remove wallet from claim guard only — does not change the mint counter. */
@@ -98,7 +102,8 @@ class FileBackend implements ClaimBackend {
   async reserveClaim(
     projectId: string,
     wallet: string,
-    startFrom: number
+    startFrom: number,
+    maxIndex?: number
   ): Promise<{ metadataIndex: number }> {
     const state = this.load();
     const list = state.claimsByProject[projectId] || [];
@@ -109,6 +114,9 @@ class FileBackend implements ClaimBackend {
       state.counters[projectId] = startFrom;
     }
     const metadataIndex = state.counters[projectId];
+    if (typeof maxIndex === "number" && metadataIndex > maxIndex) {
+      throw new Error(CAMPAIGN_FULL_MESSAGE);
+    }
     state.counters[projectId] = metadataIndex + 1;
     state.claimsByProject[projectId] = [...list, wallet];
     this.save(state);
@@ -203,13 +211,17 @@ class RedisBackend implements ClaimBackend {
    * Atomic claim reservation via Lua:
    *   - reject if wallet already in set
    *   - initialize counter to startFrom if missing
+   *   - reject if the next index would pass maxIndex (counter is left untouched)
    *   - increment and return new value-1 (the index assigned)
    *   - record wallet in set + project in projects index
+   *
+   * The cap lives inside the script so concurrent claims can't race past it.
    */
   async reserveClaim(
     projectId: string,
     wallet: string,
-    startFrom: number
+    startFrom: number,
+    maxIndex?: number
   ): Promise<{ metadataIndex: number }> {
     const script = `
       local walletsKey = KEYS[1]
@@ -218,6 +230,7 @@ class RedisBackend implements ClaimBackend {
       local wallet = ARGV[1]
       local startFrom = tonumber(ARGV[2])
       local projectId = ARGV[3]
+      local maxIndex = tonumber(ARGV[4])
 
       if redis.call('SISMEMBER', walletsKey, wallet) == 1 then
         return -1
@@ -228,6 +241,10 @@ class RedisBackend implements ClaimBackend {
       end
 
       local idx = tonumber(redis.call('GET', counterKey))
+      if maxIndex ~= nil and idx > maxIndex then
+        return -2
+      end
+
       redis.call('INCR', counterKey)
       redis.call('SADD', walletsKey, wallet)
       redis.call('SADD', projectsKey, projectId)
@@ -236,11 +253,15 @@ class RedisBackend implements ClaimBackend {
     const result = (await this.redis.eval(
       script,
       [this.walletsKey(projectId), this.counterKey(projectId), this.projectIndexKey],
-      [wallet, String(startFrom), projectId]
+      // "" makes tonumber() return nil in Lua, i.e. no cap.
+      [wallet, String(startFrom), projectId, typeof maxIndex === "number" ? String(maxIndex) : ""]
     )) as number;
 
     if (result === -1) {
       throw new Error("This wallet has already claimed an NFT for this campaign.");
+    }
+    if (result === -2) {
+      throw new Error(CAMPAIGN_FULL_MESSAGE);
     }
     return { metadataIndex: Number(result) };
   }
@@ -333,9 +354,10 @@ export function hasWalletClaimed(
 export function reserveClaim(
   projectId: string,
   walletAddress: string,
-  startFrom: number
+  startFrom: number,
+  maxIndex?: number
 ): Promise<{ metadataIndex: number }> {
-  return backend.reserveClaim(projectId, walletAddress, startFrom);
+  return backend.reserveClaim(projectId, walletAddress, startFrom, maxIndex);
 }
 
 export function releaseReservation(
