@@ -40,9 +40,11 @@ export type ProjectMintConfig = {
   maxMetadataIndex?: number;
 };
 
+// Must match the `image` inside the pinned metadata JSON, or the claim page
+// previews one picture while the minted NFT shows another.
 const DEFAULT_MEDIA =
   process.env.NEXT_PUBLIC_DEFAULT_MINT_MEDIA ||
-  "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeih2hdckjt2pkc3chd6zyt3c2muxhfycekfnquvvuop7oyd52kppdi";
+  "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeicelhcjrnahrame62vuiskwpfuugcpbklukxzuxr3itos5tnmepwe";
 
 const DEFAULT_METADATA_BASE =
   process.env.NEXT_PUBLIC_CNFT_METADATA_URI ||
@@ -101,7 +103,6 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
       process.env.NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI || DEFAULT_METADATA_BASE,
     nftNameTemplate: "Unify Genesis Promo #{index}",
     symbol: "UNIFY",
-    mediaType: "video",
     defaultStartMetadataIndex: 1,
     // Limited edition: indexes 1..100 only.
     maxMetadataIndex: 100,
