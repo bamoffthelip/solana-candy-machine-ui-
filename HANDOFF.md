@@ -81,6 +81,23 @@ Current state of the shared Unify metadata folder: indexes **13–200** exist.
 An existing IPFS CID cannot gain files. Adding supply means pinning a new
 folder and pointing the campaign at the new CID.
 
+### Partner branding stays off-chain
+
+`description` and `attributes` are written into NFT metadata. Partner or
+meme-coin branding belongs in `promoNote` instead, which renders on the claim
+page and in the claim email but never reaches metadata.
+
+This is deliberate. Wallet spam filters read NFT metadata, and a flag can
+follow the shared collection and creator address into every other campaign —
+all campaigns currently mint under collection `DVaJS3…QsM` and creator
+`66LDYvh9…fjtt`. A previous Epstain-branded drop was filtered and hidden by
+Phantom, and it took months to diagnose. cNFT metadata also cannot be quietly
+corrected afterwards.
+
+If a campaign ever must carry partner branding on-chain, give it its own
+collection NFT *and* its own mint authority wallet so a flag cannot reach the
+main Unify collection.
+
 ---
 
 ## Claim store

@@ -30,6 +30,9 @@ const NftViewPage: NextPage = () => {
             Claim this promo NFT with email/Google (no crypto wallet needed) or with a connected
             Solana wallet.
           </p>
+          {project.promoNote ? (
+            <p className="mt-2 text-sm opacity-60">{project.promoNote}</p>
+          ) : null}
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

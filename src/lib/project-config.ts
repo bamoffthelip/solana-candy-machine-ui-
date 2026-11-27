@@ -13,6 +13,14 @@ export type ProjectMintConfig = {
   mediaUrl: string;
   mediaType?: "image" | "video";
   attributes: ProjectAttribute[];
+  /**
+   * Partner or campaign copy shown on the claim page and in the claim email.
+   * Deliberately kept out of `description` and `attributes`, which are written
+   * into NFT metadata: wallet spam filters read that metadata, a flag there can
+   * follow the shared collection and creator across every campaign, and cNFT
+   * metadata cannot be quietly corrected afterwards.
+   */
+  promoNote?: string;
   /** Base URI for metadata JSON folder (trailing slash optional; we append /{index}.json). */
   metadataBaseUri: string;
   /** NFT name on-chain; {index} is replaced with the metadata index. */
@@ -79,16 +87,16 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
     id: "unifygenesispromo",
     title: "Unify Genesis Promo cNFT",
     description:
-      "Free commemorative compressed NFT for the Unify x Epstain Genesis Promo. First-claim wins #1.",
+      "Free commemorative compressed NFT for the Unify Genesis Promo. First-claim wins #1.",
     mediaUrl:
       process.env.NEXT_PUBLIC_UNIFY_GENESIS_MEDIA || DEFAULT_MEDIA,
     attributes: [
       { trait_type: "Campaign", value: "Unify Genesis Promo" },
       { trait_type: "Edition", value: "Genesis" },
-      { trait_type: "Partner", value: "Epstain" },
       { trait_type: "Type", value: "cNFT" },
       { trait_type: "Network", value: "Solana" },
     ],
+    promoNote: "In partnership with Epstain.",
     metadataBaseUri:
       process.env.NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI || DEFAULT_METADATA_BASE,
     nftNameTemplate: "Unify Genesis Promo #{index}",
