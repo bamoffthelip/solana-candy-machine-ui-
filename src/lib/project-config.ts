@@ -13,6 +13,14 @@ export type ProjectMintConfig = {
   mediaUrl: string;
   mediaType?: "image" | "video";
   attributes: ProjectAttribute[];
+  /**
+   * Partner or campaign copy shown on the claim page and in the claim email.
+   * Deliberately kept out of `description` and `attributes`, which are written
+   * into NFT metadata: wallet spam filters read that metadata, a flag there can
+   * follow the shared collection and creator across every campaign, and cNFT
+   * metadata cannot be quietly corrected afterwards.
+   */
+  promoNote?: string;
   /** Base URI for metadata JSON folder (trailing slash optional; we append /{index}.json). */
   metadataBaseUri: string;
   /** NFT name on-chain; {index} is replaced with the metadata index. */
@@ -24,11 +32,19 @@ export type ProjectMintConfig = {
   merkleTree?: string;
   /** First index to use for metadata filenames when server assigns the next index (env can override). */
   defaultStartMetadataIndex: number;
+  /**
+   * Highest metadata index that exists in `metadataBaseUri` (inclusive).
+   * Claims stop once the counter passes it, so a campaign can never mint an
+   * NFT whose `{index}.json` would 404. Omit for an uncapped campaign.
+   */
+  maxMetadataIndex?: number;
 };
 
+// Must match the `image` inside the pinned metadata JSON, or the claim page
+// previews one picture while the minted NFT shows another.
 const DEFAULT_MEDIA =
   process.env.NEXT_PUBLIC_DEFAULT_MINT_MEDIA ||
-  "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeih2hdckjt2pkc3chd6zyt3c2muxhfycekfnquvvuop7oyd52kppdi";
+  "https://cyan-certain-rodent-24.mypinata.cloud/ipfs/bafybeicelhcjrnahrame62vuiskwpfuugcpbklukxzuxr3itos5tnmepwe";
 
 const DEFAULT_METADATA_BASE =
   process.env.NEXT_PUBLIC_CNFT_METADATA_URI ||
@@ -53,6 +69,7 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
     nftNameTemplate: "Unify NFT #{index}",
     symbol: "UNIFY",
     defaultStartMetadataIndex: 13,
+    maxMetadataIndex: 200,
   },
   demo: {
     id: "demo",
@@ -72,21 +89,23 @@ export const PROJECTS: Record<string, ProjectMintConfig> = {
     id: "unifygenesispromo",
     title: "Unify Genesis Promo cNFT",
     description:
-      "Free commemorative compressed NFT for the Unify x Epstain Genesis Promo. First-claim wins #1.",
+      "Free commemorative compressed NFT for the Unify Genesis Promo. First-claim wins #1.",
     mediaUrl:
       process.env.NEXT_PUBLIC_UNIFY_GENESIS_MEDIA || DEFAULT_MEDIA,
     attributes: [
       { trait_type: "Campaign", value: "Unify Genesis Promo" },
       { trait_type: "Edition", value: "Genesis" },
-      { trait_type: "Partner", value: "Epstain" },
       { trait_type: "Type", value: "cNFT" },
       { trait_type: "Network", value: "Solana" },
     ],
+    promoNote: "In partnership with Epstain.",
     metadataBaseUri:
       process.env.NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI || DEFAULT_METADATA_BASE,
     nftNameTemplate: "Unify Genesis Promo #{index}",
     symbol: "UNIFY",
     defaultStartMetadataIndex: 1,
+    // Limited edition: indexes 1..100 only.
+    maxMetadataIndex: 100,
   },
 };
 

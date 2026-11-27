@@ -11,6 +11,7 @@
 
 import { Resend } from "resend";
 import { CROSSMINT_USER_COLLECTION_URL } from "./crossmint-links";
+import { getProjectConfigOrFallback } from "./project-config";
 
 export type ClaimEmailPayload = {
   to: string;
@@ -75,9 +76,13 @@ export async function sendClaimCompleteEmail(
     : null;
   const claimPage = `${appBaseUrl()}/claim/${encodeURIComponent(payload.projectId)}`;
 
+  const promoNote = getProjectConfigOrFallback(payload.projectId).promoNote;
+
   const subject = `Your ${payload.nftName} is ready`;
   const text = [
     `Your ${payload.nftName} has been claimed successfully.`,
+    promoNote ? "" : null,
+    promoNote || null,
     "",
     "Access your wallet anytime:",
     walletUrl,
@@ -99,6 +104,11 @@ export async function sendClaimCompleteEmail(
       <p style="margin: 0 0 16px;">
         <strong>${escapeHtml(payload.nftName)}</strong> has been claimed successfully.
       </p>
+      ${
+        promoNote
+          ? `<p style="margin: 0 0 16px; font-size: 14px; color: #444;">${escapeHtml(promoNote)}</p>`
+          : ""
+      }
       <p style="margin: 0 0 8px;">Access your wallet anytime (bookmark this page):</p>
       <p style="margin: 0 0 16px;">
         <a href="${escapeAttr(walletUrl)}" style="color: #4f46e5;">Open Crossmint wallet</a>

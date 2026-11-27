@@ -11,6 +11,11 @@
  *     --image "https://your-cdn.com/unify-promo-art.png" \
  *     --out ./pinata-metadata-upload
  *
+ * Video artwork: pass the clip to --image and a still frame to --poster. The
+ * clip lands on `animation_url`, the still on `image` (thumbnails), and both
+ * are listed under properties.files. Without --poster most wallets show a
+ * blank tile. Use --attributes-json to override the default trait list.
+ *
  * Image URL: use the same asset as NEXT_PUBLIC_DEFAULT_MINT_MEDIA on Vercel
  * (the Bitcoin graphic), or any https:// or ipfs:// URL wallets can fetch.
  *
@@ -38,6 +43,8 @@ function parseArgs(argv) {
     to: 50,
     out: "pinata-metadata-upload",
     image: "",
+    poster: "",
+    attributesJson: "",
     symbol: "UNIFY",
     description: "Unify NFT Collection — community promo cNFT.",
     nameTemplate: "Unify NFT #{index}",
@@ -53,6 +60,8 @@ function parseArgs(argv) {
     else if (a === "--to") opts.to = parseInt(next(), 10);
     else if (a === "--out") opts.out = next();
     else if (a === "--image") opts.image = next();
+    else if (a === "--poster") opts.poster = next();
+    else if (a === "--attributes-json") opts.attributesJson = next();
     else if (a === "--symbol") opts.symbol = next();
     else if (a === "--description") opts.description = next();
     else if (a === "--name-template") opts.nameTemplate = next();
@@ -90,28 +99,54 @@ function main() {
   const outDir = path.resolve(process.cwd(), opts.out);
   fs.mkdirSync(outDir, { recursive: true });
 
-  const attributes = [
+  let attributes = [
     { trait_type: "Campaign", value: "Unify Promo" },
     { trait_type: "Tier", value: "Community" },
     { trait_type: "Type", value: "cNFT" },
     { trait_type: "Network", value: "Solana" },
   ];
+  if (opts.attributesJson) {
+    try {
+      attributes = JSON.parse(opts.attributesJson);
+    } catch (err) {
+      console.error(`--attributes-json is not valid JSON: ${err.message}`);
+      process.exit(1);
+    }
+    if (!Array.isArray(attributes)) {
+      console.error("--attributes-json must be a JSON array of {trait_type, value}.");
+      process.exit(1);
+    }
+  }
 
   const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(image);
   const fileType = isVideo ? "video/mp4" : "image/png";
 
+  // Wallets and marketplaces use `image` for grid thumbnails, so a video needs a
+  // static poster there and the clip itself on `animation_url`.
+  const thumbnail = isVideo && opts.poster ? opts.poster : image;
+  if (isVideo && !opts.poster) {
+    console.warn(
+      "WARNING: video artwork without --poster. `image` will point at the video, " +
+        "which leaves a blank thumbnail in most wallets and marketplaces."
+    );
+  }
+
   let count = 0;
   for (let i = opts.from; i <= opts.to; i++) {
     const name = formatName(opts.nameTemplate, i);
+    const files = [{ uri: image, type: fileType }];
+    if (isVideo && opts.poster) {
+      files.push({ uri: opts.poster, type: "image/png" });
+    }
     const doc = {
       name,
       symbol: opts.symbol,
       description: opts.description,
-      image,
+      image: thumbnail,
       attributes,
       properties: {
         category: isVideo ? "video" : "image",
-        files: [{ uri: image, type: fileType }],
+        files,
       },
     };
     if (isVideo) {
