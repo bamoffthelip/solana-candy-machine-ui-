@@ -56,3 +56,4 @@ candy-machine-v2/test-crossmint-wallet.js
 # Generated cNFT metadata JSON (Pinata folder upload); do not commit
 /pinata-metadata-upload/
 /pinata-genesis-metadata/
+/pinata-genesis-metadata/
