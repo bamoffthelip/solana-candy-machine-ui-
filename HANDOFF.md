@@ -75,7 +75,7 @@ Current state of the shared Unify metadata folder: indexes **13–200** exist.
 | Campaign | Range | Status |
 |---|---|---|
 | `unify` | 13–200 | matches the pinned folder |
-| `unifygenesispromo` | 1–100 | **needs its own pinned folder** |
+| `unifygenesispromo` | 1–100 | pinned at `bafybeiahnrk4lf6dot7mrpye7526jsqg4nqu2wdxc63iyo34u44gx3egnq` via `NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI` |
 | `demo` | starts at 0 | would mint dead metadata; do not use as-is |
 
 An existing IPFS CID cannot gain files. Adding supply means pinning a new
