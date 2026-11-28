@@ -144,7 +144,7 @@ Values live in Vercel and `.env.local` (gitignored). Never commit them.
 | `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | Transactional email. |
 | `NEXT_PUBLIC_APP_URL` | Base URL used in email links. Update at domain cutover. |
 | `NEXT_PUBLIC_CROSSMINT_CLIENT_API_KEY` | Crossmint embedded auth. |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | CAPTCHA — see gaps below. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | CAPTCHA — verified in `/api/claim` when secret is set. |
 
 ---
 
@@ -171,23 +171,19 @@ burning a fresh email address.
 
 ## Known gaps before a public launch
 
-**`/api/claim` has no effective abuse protection.** This is the big one.
-
-- Turnstile is rendered in the UI and the token is sent with the claim, but
-  **it is never verified server-side**. Confirmed by posting to the production
-  endpoint with no token: the request reached the duplicate-claim check
-  instead of being rejected. Both Turnstile env vars are set, so the CAPTCHA
-  looks like it works while providing no actual protection.
-- `src/lib/rate-limit.ts` implements a per-IP sliding window but **is never
-  called**.
-
-Net effect: anyone can script `POST /api/claim` with freshly generated
-addresses and drain a campaign's entire supply. For a 100-piece limited
-edition that is a realistic attack, not a theoretical one.
+**`/api/claim` abuse protection is wired.** `checkClaimRateLimit` runs first
+(429 + `Retry-After`), then `verifyTurnstile` (403 when
+`TURNSTILE_SECRET_KEY` is set and the token is missing/invalid). Defaults:
+5 hits / IP / 60s (`CLAIM_RATELIMIT_*`). After deploy, smoke-test one real
+UI claim; a scripted `POST` with no token should 403 before the
+duplicate-claim check.
 
 Also outstanding:
 
-- Genesis needs its own pinned metadata folder and its own collection NFT.
+- Genesis metadata is pinned
+  (`bafybeiahnrk4lf6dot7mrpye7526jsqg4nqu2wdxc63iyo34u44gx3egnq`); confirm
+  `NEXT_PUBLIC_UNIFY_GENESIS_METADATA_URI` is set in Vercel. Own collection
+  NFT is still optional/outstanding.
   The Merkle tree does **not** need replacing — 16,334 of 16,384 slots are
   free, and a tree is shared storage independent of collection grouping.
 - The mint authority wallet holds ~0.11 SOL. Enough to create a collection
