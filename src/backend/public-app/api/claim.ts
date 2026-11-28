@@ -14,6 +14,8 @@ import bs58 from "bs58";
 import { formatNftName, getProjectConfigOrFallback } from "../../../lib/project-config";
 import { CAMPAIGN_FULL_MESSAGE, releaseReservation, reserveClaim } from "../../../lib/claim-store";
 import { isValidEmail, sendClaimCompleteEmail } from "../../../lib/send-claim-email";
+import { checkClaimRateLimit } from "../../../lib/rate-limit";
+import { getTurnstileTokenFromRequest, verifyTurnstile } from "../../../lib/turnstile";
 
 const RPC_ENDPOINT = process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
 const DEFAULT_COLLECTION_MINT =
@@ -65,6 +67,25 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, error: "Method not allowed" });
+  }
+
+  // Abuse protection before any mint / reservation work.
+  const rate = await checkClaimRateLimit(req);
+  if (!rate.allowed) {
+    const retryAfterSec = Math.max(1, Math.ceil(rate.resetMs / 1000));
+    res.setHeader("Retry-After", String(retryAfterSec));
+    return res.status(429).json({
+      success: false,
+      error: "Too many claim attempts. Please wait and try again.",
+    });
+  }
+
+  const turnstile = await verifyTurnstile(getTurnstileTokenFromRequest(req), rate.ip);
+  if (!turnstile.ok) {
+    return res.status(403).json({
+      success: false,
+      error: "error" in turnstile ? turnstile.error : "Turnstile verification failed",
+    });
   }
 
   const {
